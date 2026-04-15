@@ -1,4 +1,4 @@
-Currently I have done auth and crud with status tarcking done in backend
+Currently I have done auth and crud with status tarcking done in backend and frontend
 frontend implemention is left 
 then the mvp is complte then ill add some twisting feature of my own creativity I always wanted 
 in a habit app 
