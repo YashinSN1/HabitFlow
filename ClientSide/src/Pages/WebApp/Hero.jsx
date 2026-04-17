@@ -8,7 +8,6 @@ function Hero() {
   const [HabitMode, SetHabitMode] = useState("");
   const [AllHabits, SetAllHabits] = useState([]);
   const [HabitId, SetHabitId] = useState("");
-  const timerRef = useRef(null);
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -82,41 +81,37 @@ function Hero() {
   });
 
   let [HabitTrackData, SetHabitTrackData] = useState({});
+  let [isLoading, SetIsLoading] = useState({});
 
   const toggleStatus = async (habitId) => {
-    const currentStatus = HabitTrackData[habitId];
-    let newStatus = currentStatus.status;
+    if (isLoading[habitId]) return;
 
-    if (newStatus === "pending") {
-      newStatus = "completed";
-    } else if (newStatus === "completed") {
-      newStatus = "skipped";
-    } else if (newStatus === "skipped") {
-      newStatus = "pending";
-    }
+    const currentStatus = HabitTrackData[habitId]?.status || "pending";
+    let newStatus;
 
-    SetHabitTrackData((prev) => ({
-      ...prev,
-      [habitId]: { ...prev[habitId], status: newStatus },
-    }));
+    if (currentStatus === "pending") newStatus = "completed";
+    else if (currentStatus === "completed") newStatus = "skipped";
+    else newStatus = "pending";
+    SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
 
-    clearTimeout(timerRef.current);
+    try {
+      const response = await axios.patch(
+        `/api/app/habit/updateTracking/${habitId}`,
+        { status: newStatus },
+        { headers: { "Content-Type": "application/json" } },
+      );
 
-    timerRef.current = setTimeout(async () => {
-      try {
-        const response = await axios.patch(
-          `/api/app/habit/updateTracking/${habitId}`,
-          {
-            status: newStatus,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      } catch (error) {
-        console.error("Error updating tracking data:", error.response);
+      if (response.data.success) {
+        SetHabitTrackData((prev) => ({
+          ...prev,
+          [habitId]: { ...prev[habitId], status: newStatus },
+        }));
       }
-    }, 3);
+    } catch (error) {
+      console.error("Error updating tracking data:", error.response);
+    } finally {
+      SetIsLoading((prev) => ({ ...prev, [habitId]: false }));
+    }
   };
 
   const createTrackData = async (habitId, status) => {
@@ -317,6 +312,7 @@ function Hero() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
+                        disabled={!!isLoading[habit._id]}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleStatus(habit._id);
