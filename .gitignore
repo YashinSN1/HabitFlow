@@ -1,0 +1,6 @@
+.env
+.env.*
+ServerSide/src/.env
+env/
+venv/
+.venv/
