@@ -1,10 +1,7 @@
 import { useState } from "react";
 
 const DAYS_LABEL = ["M", "T", "W", "T", "F", "S", "S"];
-const START_DAY = 2;
-const TOTAL_DAYS = 30;
-const TODAY = 26;
-const HAS_DOT = [3, 7, 10, 12, 15, 17, 19, 22, 24];
+const Seven_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const HABITS = [
   { id: 1, name: "Morning run", status: "done" },
@@ -35,15 +32,51 @@ const AccentBar = ({ status }) => {
 };
 
 export function DesktopCalander() {
-  const [selectedDay, setSelectedDay] = useState(TODAY);
+  const [selectedDay, setSelectedDay] = useState(new Date().getDate());
 
-  const blanks = Array(START_DAY).fill(null);
-  const days = Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1);
+  const GenBeforeDays = () => {
+    const currentDate = new Date();
+    const AllPastDays = [];
+
+    for (let i = 0; i < 20; i++) {
+      const pastDate = new Date(currentDate);
+      pastDate.setDate(pastDate.getDate() - i);
+
+      AllPastDays.push({
+        date: pastDate.getDate(),
+        dayOfWeek: Seven_DAYS[pastDate.getDay()]
+      });
+    }
+    return AllPastDays;
+  }
+
+  const GenAfterDays = () => {
+    const currentDate = new Date();
+    const AllFutureDays = [];
+
+    for (let i = 1; i < 7; i++) {
+      const futureDate = new Date(currentDate);
+      futureDate.setDate(futureDate.getDate() + i);
+
+      AllFutureDays.push({
+        date: futureDate.getDate(),
+        dayOfWeek: Seven_DAYS[futureDate.getDay()]
+      });
+    }
+    return AllFutureDays;
+  }
+
+  const pastDays = GenBeforeDays();
+  const futureDays = GenAfterDays();
+  const allDays = [...futureDays.reverse(), ...pastDays].reverse();
+
+  const currentDate = new Date();
+  const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+  const currentYear = currentDate.getFullYear();
 
   return (
-    <div className=" w-full h-fit max-w-4xl bg-white m-auto">
+    <div className="w-full h-fit max-w-4xl bg-white m-auto">
       <div className="bg-white border w-full items-center min-h-[500px] flex justify-between border-gray-100 rounded-2xl shadow-sm">
-
         <div className="p-7 w-full">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-baseline gap-2">
@@ -51,13 +84,13 @@ export function DesktopCalander() {
                 className="text-[32px] leading-none font-black tracking-wide text-gray-900 uppercase"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
-                April
+                {currentMonth}
               </span>
               <span
                 className="text-[32px] leading-none font-black tracking-wide text-red-500 uppercase"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
-                2026
+                {currentYear}
               </span>
             </div>
           </div>
@@ -74,40 +107,31 @@ export function DesktopCalander() {
           </div>
 
           <div className="grid grid-cols-7 gap-1.5">
-            {blanks.map((_, i) => (
-              <div key={`blank-${i}`} className="aspect-square" />
-            ))}
-            {days.map((d) => {
-              const isFuture = d > TODAY;
-              const isSelected = d === selectedDay;
-              const showDot = HAS_DOT.includes(d);
+            {allDays.map((day, index) => {
+              const today = new Date().getDate();
+              const isFuture = day.date > today;
+              const isSelected = day.date === selectedDay;
+
               return (
                 <button
-                  key={d}
-                  onClick={() => !isFuture && setSelectedDay(d)}
+                  key={index}
+                  onClick={() => !isFuture && setSelectedDay(day.date)}
                   disabled={isFuture}
-                  style={{
-                    borderColor:
-                      !isSelected && !isFuture ? "#ebebeb" : undefined,
-                  }}
                   className={`
-                      aspect-square rounded-xl flex flex-col items-center justify-center border transition-all duration-150
-                      ${isFuture ? "opacity-20 cursor-default border-gray-100" : "cursor-pointer"}
-                      ${
-                        isSelected
-                          ? "bg-red-500 border-red-500 shadow-[0_4px_16px_rgba(229,62,62,0.3)]"
-                          : "bg-white hover:border-red-400 hover:bg-red-50"
-                      }
-                    `}
+                    aspect-square rounded-xl flex flex-col items-center justify-center border transition-all duration-150
+                    ${isFuture ? "opacity-20 cursor-default border-gray-100" : "cursor-pointer"}
+                    ${isSelected
+                      ? "bg-red-500 border-red-500 shadow-[0_4px_16px_rgba(229,62,62,0.3)]"
+                      : "bg-white hover:border-red-400 hover:bg-red-50"
+                    }
+                  `}
                 >
                   <span
                     className={`font-mono text-xs font-medium ${isSelected ? "text-white" : "text-gray-800"}`}
                   >
-                    {d}
+                    {day.date}
                   </span>
-                  {showDot && !isSelected && (
-                    <span className="w-1 h-1 rounded-full bg-red-500 mt-1" />
-                  )}
+                
                 </button>
               );
             })}
@@ -129,10 +153,10 @@ export function DesktopCalander() {
                 className="text-red-500 text-xl tracking-wide font-black uppercase"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
-                Apr {selectedDay}
+                {currentMonth} {selectedDay}
               </span>
               <span className="font-mono text-[11px] text-gray-300 tracking-widest">
-                {selectedDay === TODAY ? "— today" : ""}
+                {selectedDay === new Date().getDate() ? "— today" : ""}
               </span>
             </div>
           </div>
@@ -140,9 +164,8 @@ export function DesktopCalander() {
             {HABITS.map((habit, i) => (
               <div
                 key={habit.id}
-                className={`flex items-center justify-between px-5 py-3.5 bg-white hover:bg-gray-50 transition-colors ${
-                  i < HABITS.length - 1 ? "border-b border-gray-50" : ""
-                }`}
+                className={`flex items-center justify-between px-5 py-3.5 bg-white hover:bg-gray-50 transition-colors ${i < HABITS.length - 1 ? "border-b border-gray-50" : ""
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <AccentBar status={habit.status} />
@@ -154,7 +177,6 @@ export function DesktopCalander() {
               </div>
             ))}
           </div>
-          
         </div>
       </div>
     </div>
