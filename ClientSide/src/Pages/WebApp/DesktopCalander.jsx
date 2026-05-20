@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-const DAYS_LABEL = ["M", "T", "W", "T", "F", "S", "S"];
-const Seven_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const Days_Label = ["S", "M", "T", "W", "T", "F", "S",];
+const Seven_Days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const HABITS = [
   { id: 1, name: "Morning run", status: "done" },
@@ -44,9 +44,21 @@ export function DesktopCalander() {
 
       AllPastDays.push({
         date: pastDate.getDate(),
-        dayOfWeek: Seven_DAYS[pastDate.getDay()]
+        dayOfWeek: Seven_Days[pastDate.getDay()]
       });
     }
+    const getfirstPastDay = AllPastDays[AllPastDays.length - 1].dayOfWeek;
+    const daysToAdd = Seven_Days.indexOf(getfirstPastDay);
+
+    for (let i = 0; i < daysToAdd; i++) {
+
+      AllPastDays.unshift({
+        date: "",
+        dayOfWeek: "",
+        isempty: true
+      });
+    }
+
     return AllPastDays;
   }
 
@@ -60,7 +72,8 @@ export function DesktopCalander() {
 
       AllFutureDays.push({
         date: futureDate.getDate(),
-        dayOfWeek: Seven_DAYS[futureDate.getDay()]
+        dayOfWeek: Seven_Days[futureDate.getDay()],
+        locked: true
       });
     }
     return AllFutureDays;
@@ -68,7 +81,7 @@ export function DesktopCalander() {
 
   const pastDays = GenBeforeDays();
   const futureDays = GenAfterDays();
-  const allDays = [...futureDays.reverse(), ...pastDays].reverse();
+  const allDays = [...futureDays.reverse(), ...pastDays.reverse()].reverse();
 
   const currentDate = new Date();
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
@@ -96,7 +109,7 @@ export function DesktopCalander() {
           </div>
 
           <div className="grid grid-cols-7 gap-1.5 mb-2">
-            {DAYS_LABEL.map((d, i) => (
+            {Days_Label.map((d, i) => (
               <div
                 key={i}
                 className="font-mono text-[10px] text-gray-300 text-center tracking-widest py-1"
@@ -104,22 +117,23 @@ export function DesktopCalander() {
                 {d}
               </div>
             ))}
-          </div>
 
-          <div className="grid grid-cols-7 gap-1.5">
+
+
+
             {allDays.map((day, index) => {
               const today = new Date().getDate();
-              const isFuture = day.date > today;
               const isSelected = day.date === selectedDay;
 
               return (
                 <button
                   key={index}
-                  onClick={() => !isFuture && setSelectedDay(day.date)}
-                  disabled={isFuture}
+                  onClick={() => !day.locked && setSelectedDay(day.date)}
+                  disabled={day.locked}
                   className={`
+                    ${day.isempty ? "cursor-default opacity-0" : ""}
                     aspect-square rounded-xl flex flex-col items-center justify-center border transition-all duration-150
-                    ${isFuture ? "opacity-20 cursor-default border-gray-100" : "cursor-pointer"}
+                    ${day.locked ? "opacity-20 cursor-default border-gray-100" : "cursor-pointer"}
                     ${isSelected
                       ? "bg-red-500 border-red-500 shadow-[0_4px_16px_rgba(229,62,62,0.3)]"
                       : "bg-white hover:border-red-400 hover:bg-red-50"
@@ -131,11 +145,12 @@ export function DesktopCalander() {
                   >
                     {day.date}
                   </span>
-                
+
                 </button>
               );
             })}
           </div>
+
         </div>
 
         <div
