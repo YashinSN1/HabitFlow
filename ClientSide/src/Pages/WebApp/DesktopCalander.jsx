@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const Days_Label = ["S", "M", "T", "W", "T", "F", "S",];
 const Seven_Days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -79,6 +80,20 @@ export function DesktopCalander() {
     return AllFutureDays;
   }
 
+
+  const GetHabit = (date) => {
+    const fetchHabits = async () => {
+      try {
+        const response = await axios.get(`/app/habit/tracking?date=${date}`);
+        console.log("Fetched habits for date: ", date, response.data);
+      } catch (error) {
+        console.error("Error fetching habits:", error);
+      }
+    };
+
+    fetchHabits();
+  };
+
   const pastDays = GenBeforeDays();
   const futureDays = GenAfterDays();
   const allDays = [...futureDays.reverse(), ...pastDays.reverse()].reverse();
@@ -128,7 +143,7 @@ export function DesktopCalander() {
               return (
                 <button
                   key={index}
-                  onClick={() => !day.locked && setSelectedDay(day.date)}
+                  onClick={() => !day.locked && setSelectedDay(day.date) || GetHabit(day.date)}
                   disabled={day.locked}
                   className={`
                     ${day.isempty ? "cursor-default opacity-0" : ""}

@@ -83,7 +83,14 @@ export const GetHabitTrackingData = async (req, res) => {
       });
     }
 
-    const trackingData = await HabitTracking.find({ userId: Userid });
+    let trackingData;
+
+    if (!req.params.date) {
+      trackingData = await HabitTracking.find({ userId: Userid });
+    } else {
+      trackingData = await HabitTracking.find({ userId: Userid, date: req.params.date });
+    }
+
     if (!trackingData || trackingData.length === 0) {
       return res.status(200).json({
         success: true,
