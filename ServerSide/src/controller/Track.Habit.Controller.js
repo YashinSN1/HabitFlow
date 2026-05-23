@@ -42,6 +42,7 @@ export const TrackHabitRecord = async (req, res) => {
       habitId: Habitid,
       status: status,
       notes: notes,
+      date: date,
       logReason: LogReason,
     });
 
@@ -70,10 +71,12 @@ export const TrackHabitRecord = async (req, res) => {
   }
 };
 
+
 export const GetHabitTrackingData = async (req, res) => {
   try {
     const Userid = req.user.id;
     const UserExist = await User.findById(Userid);
+    const { HabitTrackDate } = req.params;
 
     if (!UserExist) {
       return res.status(404).json({
@@ -85,10 +88,10 @@ export const GetHabitTrackingData = async (req, res) => {
 
     let trackingData;
 
-    if (!req.params.date) {
-      trackingData = await HabitTracking.find({ userId: Userid });
+    if (!HabitTrackDate) {
+      trackingData = await HabitTracking.find({ userId: Userid }).populate('habitId', 'title category priority');
     } else {
-      trackingData = await HabitTracking.find({ userId: Userid, date: req.params.date });
+      trackingData = await HabitTracking.find({ userId: Userid, date: HabitTrackDate }).populate('habitId', 'title category priority');
     }
 
     if (!trackingData || trackingData.length === 0) {
@@ -113,6 +116,7 @@ export const GetHabitTrackingData = async (req, res) => {
   }
 };
 
+
 export const UpdateHabitTrackingRecord = async (req, res) => {
   try {
     let userId = req.user.id;
@@ -124,7 +128,7 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
       habitId: habitId,
     });
 
-    const { status, notes, LogReason } = req.body;
+    const { status, notes, LogReason, date } = req.body;
 
     if (!UserExist) {
       return res.status(404).json({
@@ -162,7 +166,7 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
 
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
       { userId: userId, habitId: habitId },
-      { status: status, notes: notes, logReason: LogReason },
+      { status: status, notes: notes, logReason: LogReason, date: date },
       { new: true },
     );
 

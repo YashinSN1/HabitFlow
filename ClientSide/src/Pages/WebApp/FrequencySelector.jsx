@@ -13,7 +13,7 @@ const Frequency_Types = ["Daily", "Monthly"];
 function FrequencySelector({ HabitData, SetHabitData, onClose }) {
   const frequencyType = HabitData?.frequency?.frequencyType;
   const selectedDays = HabitData?.frequency?.days || [];
-  const selectedMonthDays = HabitData?.frequency?.monthDays || [];
+  const selectedMonthDays = HabitData?.frequency?.DaysInMonths || [];
 
   const setType = (type) => {
     SetHabitData((prev) => ({
@@ -22,7 +22,9 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
         ...prev.frequency,
         frequencyType: type,
         days: [],
-        monthDays: [],
+        months: {
+          DaysInMonths: [],
+        }
       },
     }));
   };
@@ -44,19 +46,20 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
 
   const toggleMonthDay = (num) => {
     SetHabitData((prev) => {
-      const monthDays = prev.frequency.monthDays || [];
+      const DaysInMonths = prev.frequency.months.DaysInMonths || []; 
       return {
         ...prev,
         frequency: {
           ...prev.frequency,
-          monthDays: monthDays.includes(num)
-            ? monthDays.filter((d) => d !== num)
-            : [...monthDays, num].sort((a, b) => a - b),
+          months: {
+            DaysInMonths: DaysInMonths.includes(num)
+              ? DaysInMonths.filter((d) => d !== num)
+              : [...DaysInMonths, num].sort((a, b) => a - b),
+          },
         },
       };
     });
   };
-
   const toggleAll = (e) => {
     SetHabitData((prev) => ({
       ...prev,

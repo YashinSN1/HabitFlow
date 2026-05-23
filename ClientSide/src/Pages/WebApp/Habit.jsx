@@ -20,11 +20,11 @@ function Habit({
   const frequencyDefault = () => {
     const type = HabitData?.frequency?.frequencyType;
     const days = HabitData?.frequency?.days || [];
-    const monthDays = HabitData?.frequency?.monthDays || [];
+    const DaysInMonths = HabitData?.frequency?.DaysInMonths || [];
     if (!type) return "Not set";
     if (type === "Monthly") {
-      if (monthDays.length === 0) return "Monthly - no days set";
-      return `Monthly - day${monthDays.length > 1 ? "s" : ""} ${monthDays.join(", ")}`;
+      if (DaysInMonths.length === 0) return "Monthly - no days set";
+      return `Monthly - day${DaysInMonths.length > 1 ? "s" : ""} ${DaysInMonths.join(", ")}`;
     }
     if (days.length === 0) return `${type} — no days set`;
     if (days.length === 7) return `${type} — Every Day`;

@@ -97,7 +97,7 @@ function Hero() {
     try {
       const response = await axios.patch(
         `/api/app/habit/updateTracking/${habitId}`,
-        { status: newStatus },
+        { status: newStatus, date: new Date().toISOString().split("T")[0] },
         { headers: { "Content-Type": "application/json" } },
       );
 
@@ -119,8 +119,8 @@ function Hero() {
       const response = await axios.post(
         `/api/app/habit/createTracking/${habitId}`,
         {
-          habitId,
           status,
+          date: new Date().toISOString().split("T")[0],
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -128,7 +128,6 @@ function Hero() {
       );
 
       if (response.data.success) {
-        console.log("Tracking data created/updated successfully");
 
         SetHabitTrackData((prev) => ({
           ...prev,
@@ -192,9 +191,9 @@ function Hero() {
           headers: { "Content-Type": "application/json" },
         },
       );
-
       if (response.data.success) {
         alert("Habit Created Successfully");
+
         const ressponseHabit = response.data.Habit;
         SetAllHabits((prev) => [...prev, ressponseHabit]);
         createTrackData(response.data.Habit._id, "pending");
@@ -203,6 +202,7 @@ function Hero() {
       }
     } catch (error) {
       console.error("Error response:", error.response);
+
     }
   };
 
