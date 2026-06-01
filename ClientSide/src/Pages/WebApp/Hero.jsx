@@ -88,7 +88,6 @@ function Hero() {
 
     const currentStatus = HabitTrackData[habitId]?.status || "pending";
     let newStatus;
-
     if (currentStatus === "pending") newStatus = "completed";
     else if (currentStatus === "completed") newStatus = "skipped";
     else newStatus = "pending";

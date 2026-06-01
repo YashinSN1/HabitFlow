@@ -61,8 +61,10 @@ export function DesktopCalander() {
       });
     }
 
-    const getfirstPastDay = AllPastDays[AllPastDays.length - 1].dayOfWeek;
-    const daysToAdd = Seven_Days.indexOf(getfirstPastDay);
+    AllPastDays.reverse();
+
+    const firstDay = AllPastDays[0].dayOfWeek;
+    const daysToAdd = Seven_Days.indexOf(firstDay);
 
     for (let i = 0; i < daysToAdd; i++) {
       AllPastDays.unshift({ date: "", dayNumber: "", dayOfWeek: "", isempty: true });
@@ -79,7 +81,7 @@ export function DesktopCalander() {
       const futureDate = new Date(currentDate);
       futureDate.setDate(futureDate.getDate() + i);
       AllFutureDays.push({
-        date: futureDate.toISOString().split("T")[0], 
+        date: futureDate.toISOString().split("T")[0],
         dayNumber: futureDate.getDate(),
         dayOfWeek: Seven_Days[futureDate.getDay()],
         locked: true
@@ -90,7 +92,7 @@ export function DesktopCalander() {
 
   const pastDays = GenBeforeDays();
   const futureDays = GenAfterDays();
-  const allDays = [...futureDays.reverse(), ...pastDays].reverse();
+  const allDays = [...futureDays.reverse(), ...pastDays.reverse()].reverse();
 
   const currentDate = new Date();
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
@@ -121,7 +123,7 @@ export function DesktopCalander() {
             ))}
 
             {allDays.map((day, index) => {
-              const isSelected = day.date === selectedDay; 
+              const isSelected = day.date === selectedDay;
 
               return (
                 <button
@@ -136,7 +138,7 @@ export function DesktopCalander() {
                   `}
                 >
                   <span className={`font-mono text-xs font-medium ${isSelected ? "text-white" : "text-gray-800"}`}>
-                    {day.dayNumber}  
+                    {day.dayNumber}
                   </span>
                 </button>
               );
@@ -150,7 +152,7 @@ export function DesktopCalander() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-baseline gap-2">
               <span className="text-red-500 text-xl tracking-wide font-black uppercase" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                {currentMonth} {selectedDayNumber}  
+                {currentMonth} {selectedDayNumber}
               </span>
               <span className="font-mono text-[11px] text-gray-300 tracking-widest">
                 {selectedDay === new Date().toISOString().split("T")[0] ? "— today" : ""}
