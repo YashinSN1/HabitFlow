@@ -62,25 +62,16 @@ export const AuthenticateUser = async (req, res, next) => {
             });
         }
 
-        if (!decodedUser) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid token payload",
-                errorReference: "INVALID_TOKEN_PAYLOAD",
-                details: "Token verification succeeded but returned invalid user data"
-            });
-        }
-
         if (!decodedUser.id || !decodedUser.email) {
             return res.status(401).json({
                 success: false,
                 message: "Incomplete token data",
-                errorReferebnce: "INCOMPLETE_TOKEN_DATA",
+                errorReference: "INCOMPLETE_TOKEN_DATA",
                 details: "Token payload is missing required user identification fields"
             });
         }
 
-        const user = await User.findById(decodedUser.id).select('+password');
+        const user = await User.findById(decodedUser.id);
 
         if (!user) {
             return res.status(401).json({
