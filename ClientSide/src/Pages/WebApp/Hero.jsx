@@ -8,6 +8,8 @@ function Hero() {
   const [HabitMode, SetHabitMode] = useState("");
   const [AllHabits, SetAllHabits] = useState([]);
   const [HabitId, SetHabitId] = useState("");
+  let [HabitTrackData, SetHabitTrackData] = useState({});
+  let [isLoading, SetIsLoading] = useState({});
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -25,15 +27,12 @@ function Hero() {
     const fetchTrackData = async () => {
       try {
         const response = await axios.get("/api/app/habit/tracking");
-
         if (response.data.success) {
           const trackingData = response.data.TrackData;
           const trackDataMap = {};
-
           trackingData.forEach((item) => {
-            trackDataMap[item.habitId] = item;
+            trackDataMap[item.habitId._id] = item;
           });
-
           SetHabitTrackData(trackDataMap);
         }
       } catch (error) {
@@ -50,7 +49,6 @@ function Hero() {
         }
       }
     };
-
     fetchHabits();
     fetchTrackData();
   }, []);
@@ -80,9 +78,6 @@ function Hero() {
     reminder: false,
   });
 
-  let [HabitTrackData, SetHabitTrackData] = useState({});
-  let [isLoading, SetIsLoading] = useState({});
-
   const toggleStatus = async (habitId) => {
     if (isLoading[habitId]) return;
 
@@ -99,13 +94,12 @@ function Hero() {
         { status: newStatus, date: new Date().toISOString().split("T")[0] },
         { headers: { "Content-Type": "application/json" } },
       );
-
       if (response.data.success) {
-        SetHabitTrackData((prev) => ({
-          ...prev,
-          [habitId]: { ...prev[habitId], status: newStatus },
-        }));
+        let newHabitTrackData = { ...HabitTrackData, [habitId]: { status: newStatus } };
+        SetHabitTrackData(newHabitTrackData);
       }
+      console.log(HabitTrackData[habitId], "HabitTrackData");
+
     } catch (error) {
       console.error("Error updating tracking data:", error.response);
     } finally {
@@ -318,13 +312,13 @@ function Hero() {
                         }}
                         className=" border border-gray-300 text-black px-3 py-3 rounded-xl hover:bg-gray-100"
                       >
-                        {HabitTrackData[habit._id]?.status === "completed" ? (
+                        {HabitTrackData[habit._id]?.status === "completed" && HabitTrackData[habit._id]?.status !== "skipped" && HabitTrackData[habit._id]?.status !== "pending" ? (
                           <img
                             className="w-5"
                             src={assets.checkmark}
                             alt="checked"
                           />
-                        ) : HabitTrackData[habit._id]?.status === "skipped" ? (
+                        ) : HabitTrackData[habit._id]?.status === "skipped" && HabitTrackData[habit._id]?.status !== "completed" && HabitTrackData[habit._id]?.status !== "pending" ? (
                           <img className="w-5" src={assets.cross} alt="cross" />
                         ) : null}
                       </button>
