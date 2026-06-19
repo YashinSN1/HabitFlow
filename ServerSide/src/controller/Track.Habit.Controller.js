@@ -86,13 +86,23 @@ export const GetHabitTrackingData = async (req, res) => {
       });
     }
 
+    const startOfDay = new Date(HabitTrackDate);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(HabitTrackDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+
+
     let trackingData;
 
     if (!HabitTrackDate) {
       trackingData = await HabitTracking.find({ userId: Userid }).populate('habitId', 'title category priority');
     } else {
-      trackingData = await HabitTracking.find({ userId: Userid, date: HabitTrackDate }).populate('habitId', 'title category priority');
+      trackingData = await HabitTracking.find({ userId: Userid, date: HabitTrackDate }).populate('habitId', 'title category priority status');
     }
+
+     console.log("Retrieved Tracking Data:", trackingData);
 
     if (!trackingData || trackingData.length === 0) {
       return res.status(200).json({

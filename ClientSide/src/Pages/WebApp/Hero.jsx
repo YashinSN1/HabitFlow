@@ -98,7 +98,6 @@ function Hero() {
         let newHabitTrackData = { ...HabitTrackData, [habitId]: { status: newStatus } };
         SetHabitTrackData(newHabitTrackData);
       }
-      console.log(HabitTrackData[habitId], "HabitTrackData");
 
     } catch (error) {
       console.error("Error updating tracking data:", error.response);
