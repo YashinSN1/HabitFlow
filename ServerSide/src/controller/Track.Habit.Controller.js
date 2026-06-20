@@ -102,7 +102,7 @@ export const GetHabitTrackingData = async (req, res) => {
       trackingData = await HabitTracking.find({ userId: Userid, date: HabitTrackDate }).populate('habitId', 'title category priority status');
     }
 
-     console.log("Retrieved Tracking Data:", trackingData);
+    console.log("Retrieved Tracking Data:", trackingData);
 
     if (!trackingData || trackingData.length === 0) {
       return res.status(200).json({
@@ -175,15 +175,14 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
     }
 
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
-      { userId: userId, habitId: habitId },
-      { status: status, notes: notes, logReason: LogReason, date: date },
+      { userId: userId, habitId: habitId },//date: date add this once logging date each day is complete
+      { status: status, notes: notes, logReason: LogReason,},
       { new: true },
     );
 
     return res.status(200).json({
       success: true,
       message: "Habit tracking record updated successfully",
-      TrackData: UpdatedTrackRecord,
     });
   } catch (error) {
     return res.status(500).json({

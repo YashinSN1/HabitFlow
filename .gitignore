@@ -4,3 +4,5 @@ ServerSide/src/.env
 env/
 venv/
 .venv/
+ClientSide/node_modules
+ServerSide/src/node_modules
