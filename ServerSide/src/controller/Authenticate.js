@@ -30,7 +30,8 @@ export const RegisterUser = async (req, res) => {
         let errorMessage = "Internal Server Error";
         let errorReference = "REGISTRATION_FAILED";
         let errorDetails = error.message;
-
+        console.log(error.code)
+        console.log(error.message)
         if (error.name === 'ValidationError') {
             errorMessage = "Validation Error: Invalid user data provided";
             errorReference = "VALIDATION_ERROR";

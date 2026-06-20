@@ -57,7 +57,12 @@ const UserSchema = new mongoose.Schema({
             token: { type: String },
             createdAt: { type: Date, default: Date.now }
         }
-    ]
+    ],
+
+    timezone: {
+        type: String,
+        default: 'UTC'
+    },
 
 }, { timestamps: true });
 

@@ -7,6 +7,7 @@ import { CreateHabit, DeleteHabit, UpdateMyHabit, GetMyHabits } from '../control
 import AuthorizeUser from '../middleware/Authorize.User.js';
 
 router.get('/app', AuthorizeUser, AppController);
+router.post('/app/timezone', AuthorizeUser, AppController);
 router.post('/app/newhabit', AuthorizeUser, ValidateSchema(HabitSchema), CreateHabit);
 router.get('/app/habits', AuthorizeUser, GetMyHabits);
 router.delete('/app/habits/:habitId', AuthorizeUser, DeleteHabit)
