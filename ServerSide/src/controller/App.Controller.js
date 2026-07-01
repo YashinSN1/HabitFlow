@@ -5,8 +5,6 @@ export const AppController = async (req, res) => {
     try {
         const { timezone } = req.body;
 
-        console.log("AppController - Received request with timezone:", timezone);
-
         if (!timezone) {
             return res.status(400).json({
                 success: false,
@@ -17,7 +15,7 @@ export const AppController = async (req, res) => {
         const user = await User.findByIdAndUpdate(
             req.user.id,
             { timezone },
-            { new: true } 
+            { new: true }
         );
 
         if (!user) {
@@ -36,7 +34,7 @@ export const AppController = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 status: user.status || 'active',
-                timezone: user.timezone 
+                timezone: user.timezone
             },
             verifiedAt: new Date().toISOString()
         });
