@@ -113,6 +113,7 @@ function Hero() {
         {
           status,
           date: new Date().toISOString().split("T")[0],
+          type: "create",
         },
         {
           headers: { "Content-Type": "application/json" },

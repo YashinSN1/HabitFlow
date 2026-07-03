@@ -7,7 +7,7 @@ export const TrackHabitRecord = async (req, res) => {
     const Habitid = req.params.Habitid;
     const Userid = req.user.id;
 
-    const { status, notes, date, LogReason } = req.body;
+    const { status, notes, date, LogReason, type } = req.body;
 
     const UserExist = await User.findById(Userid);
 
@@ -40,9 +40,10 @@ export const TrackHabitRecord = async (req, res) => {
     const newHabitTracking = new HabitTracking({
       userId: Userid,
       habitId: Habitid,
+      date: date,
+      type: type, 
       status: status,
       notes: notes,
-      date: date,
       logReason: LogReason,
     });
 
@@ -175,10 +176,12 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
     }
 
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
-      { userId: userId, habitId: habitId },//date: date add this once logging date each day is complete
-      { status: status, notes: notes, logReason: LogReason,},
+      { userId: userId, habitId: habitId },
+      { status: status, notes: notes, logReason: LogReason, },
       { new: true },
     );
+
+    //after its updated careate a event entry with the date of today the habit was updated the event got triggered 
 
     return res.status(200).json({
       success: true,

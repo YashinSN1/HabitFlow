@@ -1,10 +1,26 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 const TrackHabitData = Joi.object({
-    status: Joi.string().valid('pending', 'completed', 'skipped').required(),
-    date: Joi.date().iso().required(),
-    notes: Joi.string().allow('', null).max(500).optional(),
-    logReason: Joi.string().allow('', null).max(200).optional(),
+  status: Joi.string()
+    .valid("pending", "completed", "skipped")
+    .required(),
+
+  date: Joi.date().iso().required(),
+
+
+  type: Joi.string()
+    .valid("create", "log")
+    .required(),
+
+  notes: Joi.string()
+    .max(500)
+    .allow("", null)
+    .default(""),
+
+  logReason: Joi.string()
+    .max(200)
+    .allow("", null)
+    .default(""),
 });
 
 export default TrackHabitData;
