@@ -3,7 +3,8 @@ import User from "../models/User.js";
 
 export const AppController = async (req, res) => {
     try {
-        const { timezone } = req.body;
+
+        const timezone = req.query.timezone || req.body.timezone;
 
         if (!timezone) {
             return res.status(400).json({
@@ -14,7 +15,6 @@ export const AppController = async (req, res) => {
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { timezone },
             { new: true }
         );
 

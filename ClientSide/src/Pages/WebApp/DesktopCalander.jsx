@@ -25,8 +25,7 @@ const AccentBar = ({ status }) => {
 export function DesktopCalander() {
   const [selectedDay, setSelectedDay] = useState(new Date().toISOString().split("T")[0]);
   const [AllHabits, SetAllHabits] = useState([]);
-
-
+  console.log(AllHabits);
   useEffect(() => {
     const fetchTrackData = async () => {
       try {

@@ -9,6 +9,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+
   const LoginUser = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -22,8 +23,14 @@ function Login() {
       });
 
       if (response.data.success) {
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
         try {
-          const appRes = await axios.get("/api/app", { withCredentials: true });
+          const appRes = await axios.get("/api/app", {  //forgot that axious get accept only 2 parameters, so I had to move the timezone to params
+            withCredentials: true,
+            params: { timezone: userTimezone },
+            headers: { "Content-Type": "application/json" },
+          });
 
           if (appRes.data.success) {
             navigate("/app", { replace: true });

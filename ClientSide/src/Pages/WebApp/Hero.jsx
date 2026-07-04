@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Habit from "./Habit.jsx";
 import React from "react";
 import assets from "@/assets/assets.js";
@@ -8,6 +8,9 @@ function Hero() {
   const [HabitMode, SetHabitMode] = useState("");
   const [AllHabits, SetAllHabits] = useState([]);
   const [HabitId, SetHabitId] = useState("");
+  const [todayDate, setTodayDate] = useState(
+    () => new Date().toISOString().split("T")[0],
+  );
   let [HabitTrackData, SetHabitTrackData] = useState({});
   let [isLoading, SetIsLoading] = useState({});
 
@@ -53,11 +56,35 @@ function Hero() {
     fetchTrackData();
   }, []);
 
+  // useEffect(() => {
+  //   const todayDate = new Date().toISOString().split("T")[0];
+  //   const fetchTrackData = async () => {
+  //     try {
+  //       const response = await axios.get(`/api/app/habit/tracking/${todayDate}`);
+  //       if (response.data.success) {
+  //         const trackingData = response.data.TrackData;
+  //         const trackDataMap = {};
+  //         trackingData.forEach((item) => {
+  //           trackDataMap[item.habitId._id] = item;
+  //         });
+  //         SetHabitTrackData(trackDataMap);
+  //       }
+  //     } catch (error) {
+  //       if (error.response) {
+  //         console.log("Status:", error.response.status);
+  //         console.log("Backend Message:", error.response.data.message);
+  //         console.log("Full Backend Data:", error.response.data);
+  //       }
+  //     }
+  //   }
+  // }, []);
+
   let CancelMode = () => {
     SetHabitMode("");
     ResetHabitData();
     SetHabitId("");
   };
+
 
   let [HabitData, SetHabitData] = React.useState({
     HabitId: "",
@@ -91,7 +118,7 @@ function Hero() {
     try {
       const response = await axios.patch(
         `/api/app/habit/updateTracking/${habitId}`,
-        { status: newStatus, date: new Date().toISOString().split("T")[0] },
+        { status: newStatus, date: todayDate, type: "log" },
         { headers: { "Content-Type": "application/json" } },
       );
       if (response.data.success) {
@@ -111,8 +138,7 @@ function Hero() {
       const response = await axios.post(
         `/api/app/habit/createTracking/${habitId}`,
         {
-          status,
-          date: new Date().toISOString().split("T")[0],
+          date: todayDate,
           type: "create",
         },
         {

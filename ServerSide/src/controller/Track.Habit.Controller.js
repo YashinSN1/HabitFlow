@@ -1,13 +1,16 @@
 import Habit from "../models/Habit.js";
 import User from "../models/User.js";
 import HabitTracking from "../models/Habit.Tracking.js";
+import { getDayRange } from "../utils/getDayRange.js";
+import { buildDefaultTrackEntry } from "../utils/buildDefaultTrackEntry.js";
+
 
 export const TrackHabitRecord = async (req, res) => {
   try {
     const Habitid = req.params.Habitid;
     const Userid = req.user.id;
 
-    const { status, notes, date, LogReason, type } = req.body;
+    const { type } = req.body;
 
     const UserExist = await User.findById(Userid);
 
@@ -41,10 +44,7 @@ export const TrackHabitRecord = async (req, res) => {
       userId: Userid,
       habitId: Habitid,
       date: date,
-      type: type, 
-      status: status,
-      notes: notes,
-      logReason: LogReason,
+      type: type,
     });
 
     await newHabitTracking.save();
@@ -72,7 +72,6 @@ export const TrackHabitRecord = async (req, res) => {
   }
 };
 
-
 export const GetHabitTrackingData = async (req, res) => {
   try {
     const Userid = req.user.id;
@@ -86,38 +85,75 @@ export const GetHabitTrackingData = async (req, res) => {
         details: `User with ID ${Userid} not found in Database`,
       });
     }
-
-    const startOfDay = new Date(HabitTrackDate);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(HabitTrackDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-
-
-
-    let trackingData;
-
+    //below code you need to understand it first before preceding
     if (!HabitTrackDate) {
-      trackingData = await HabitTracking.find({ userId: Userid }).populate('habitId', 'title category priority');
-    } else {
-      trackingData = await HabitTracking.find({ userId: Userid, date: HabitTrackDate }).populate('habitId', 'title category priority status');
-    }
+      const today = new Date().toISOString().split("T")[0];
+      const { startOfDay, endOfDay } = getDayRange(today);
 
-    console.log("Retrieved Tracking Data:", trackingData);
+      const trackingData = await HabitTracking.find({
+        userId: Userid,
+        date: { $gte: startOfDay, $lte: endOfDay },
+        type: "log",
+      }).populate("habitId", "title priority status");
 
-    if (!trackingData || trackingData.length === 0) {
+      if (!trackingData || trackingData.length === 0) {
+        return res.status(200).json({
+          success: false,
+          message: "No habit tracking data found for this user",
+          TrackData: [],
+        });
+      }
+
       return res.status(200).json({
         success: true,
-        message: "No habit tracking data found for this user",
-        TrackData: [],
+        message: "Habit tracking data retrieved successfully",
+        TrackData: trackingData,
       });
     }
+    //what is happening here is that we are getting the start and end of the day for the given HabitTrackDate and then 
+    // we are finding all the habit tracking data for that user for that day. If there is no tracking data for that day, 
+    // we are getting all the eligible habits for that user and creating default track entries for those habits. Finally, 
+    // we are returning the tracking data along with the default track entries.
+
+    const { startOfDay, endOfDay } = getDayRange(HabitTrackDate);
+
+    const trackingData = await HabitTracking.find({
+      userId: Userid,
+      date: { $gte: startOfDay, $lte: endOfDay },
+      type: "log",
+    }).populate("habitId", "title priority status");
+
+    const eligibleHabits = await Habit.find({
+      user_id: Userid,
+      createdAt: { $lte: endOfDay },
+    });
+
+    if (!trackingData || trackingData.length === 0) {
+      const defaultTrackData = eligibleHabits.map((habit) =>
+        buildDefaultTrackEntry(habit, startOfDay, Userid),
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Habit tracking data retrieved successfully",
+        TrackData: defaultTrackData,
+      });
+    }
+
+    const trackedHabitIds = new Set(
+      trackingData.map((entry) => entry.habitId._id.toString()),
+    );
+
+    const missingHabitEntries = eligibleHabits
+      .filter((habit) => !trackedHabitIds.has(habit._id.toString()))
+      .map((habit) => buildDefaultTrackEntry(habit, startOfDay, Userid));
 
     return res.status(200).json({
       success: true,
       message: "Habit tracking data retrieved successfully",
-      TrackData: trackingData,
+      TrackData: [...trackingData, ...missingHabitEntries],
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -134,12 +170,15 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
     const UserExist = await User.findById(userId);
     let habitId = req.params.Habitid;
     const HabitExists = await Habit.findById(habitId);
+    const { status, notes, LogReason, date, type } = req.body;
+
     const trackRecordExists = await HabitTracking.findOne({
       userId: userId,
       habitId: habitId,
+      date: date,
+      type: type,
     });
 
-    const { status, notes, LogReason, date } = req.body;
 
     if (!UserExist) {
       return res.status(404).json({
@@ -157,14 +196,6 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
       });
     }
 
-    if (!trackRecordExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Habit tracking record not found",
-        details: `Tracking record for user ${userId} and habit ${habitId} not found`,
-      });
-    }
-
     const isOwner = HabitExists?.user_id?.toString() === userId;
 
     if (!isOwner) {
@@ -175,13 +206,24 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
       });
     }
 
+    if (!trackRecordExists) {
+      const createdTrackRecord = new HabitTracking({
+        userId: userId,
+        habitId: habitId,
+        date: date,
+        status: status,
+        notes: notes,
+        type: type,
+        logReason: LogReason,
+      });
+      await createdTrackRecord.save();
+    }
+
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
-      { userId: userId, habitId: habitId },
+      { userId: userId, habitId: habitId, date: date, type: type },
       { status: status, notes: notes, logReason: LogReason, },
       { new: true },
     );
-
-    //after its updated careate a event entry with the date of today the habit was updated the event got triggered 
 
     return res.status(200).json({
       success: true,

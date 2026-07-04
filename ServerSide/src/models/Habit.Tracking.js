@@ -39,6 +39,6 @@ const HabitEventSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-HabitEventSchema.index({ habitId: 1, date: 1 }, { unique: true });
+HabitEventSchema.index({ habitId: 1, date: 1, type: 1 }, { unique: true }); // changed index to include type to avoid duplicate key error; dropped old index since documents already existed with same data
 
 export default mongoose.model("HabitEvent", HabitEventSchema);
