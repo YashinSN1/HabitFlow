@@ -254,7 +254,7 @@ export const DeleteHabit = async (req, res) => {
     const isPrivileged = ["admin", "moderator", "user"].includes(user.role);
 
     if (isPrivileged) {
-      await HabitTracking.deleteOne({ habitId: habitId });
+      await HabitTracking.deleteMany({ habitId: habitId });
 
       const result = await Habit.deleteOne({ _id: habitId });
 
@@ -276,11 +276,6 @@ export const DeleteHabit = async (req, res) => {
     }
 
     await HabitTracking.deleteMany({ userId: authUser.id, habitId: habitId });
-
-    const result = await Habit.deleteOne({
-      _id: habitId,
-      user_id: authUser.id,
-    });
 
     if (result.deletedCount === 0) {
       const exists = await Habit.exists({ _id: habitId });
