@@ -85,7 +85,7 @@ export const GetHabitTrackingData = async (req, res) => {
         details: `User with ID ${Userid} not found in Database`,
       });
     }
-    //below code you need to understand it first before preceding
+
     if (!HabitTrackDate) {
       const today = new Date().toISOString().split("T")[0];
       const { startOfDay, endOfDay } = getDayRange(today);
@@ -108,12 +108,8 @@ export const GetHabitTrackingData = async (req, res) => {
         success: true,
         message: "Habit tracking data retrieved successfully",
         TrackData: trackingData,
-      });
+      });  //till here logic is working backend is sending me data but in frontend it is not showing data in console.log
     }
-    //what is happening here is that we are getting the start and end of the day for the given HabitTrackDate and then 
-    // we are finding all the habit tracking data for that user for that day. If there is no tracking data for that day, 
-    // we are getting all the eligible habits for that user and creating default track entries for those habits. Finally, 
-    // we are returning the tracking data along with the default track entries.
 
     const { startOfDay, endOfDay } = getDayRange(HabitTrackDate);
 
@@ -136,7 +132,7 @@ export const GetHabitTrackingData = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Habit tracking data retrieved successfully",
-        TrackData: defaultTrackData,
+        TrackData: defaultTrackData, 
       });
     }
 
@@ -147,6 +143,8 @@ export const GetHabitTrackingData = async (req, res) => {
     const missingHabitEntries = eligibleHabits
       .filter((habit) => !trackedHabitIds.has(habit._id.toString()))
       .map((habit) => buildDefaultTrackEntry(habit, startOfDay, Userid));
+
+
 
     return res.status(200).json({
       success: true,

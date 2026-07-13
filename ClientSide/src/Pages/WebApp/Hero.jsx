@@ -19,8 +19,11 @@ function Hero() {
       try {
         const GetHabit = await axios.get("/api/app/habits");
         if (GetHabit.data.success) {
-          SetAllHabits(GetHabit.data.habits);
+          console.log("Fetched Habits:", GetHabit.data.habits);
         }
+
+        SetAllHabits(GetHabit.data.habits);
+
       } catch (error) {
         console.error("Error fetching habits:", error.message);
         console.log("Error fetching habits");
@@ -33,11 +36,19 @@ function Hero() {
         if (response.data.success) {
           const trackingData = response.data.TrackData;
           const trackDataMap = {};
+          
           trackingData.forEach((item) => {
+            if (!item.habitId) {
+              console.warn("Skipping orphaned tracking record:", item._id);
+              return;
+            }
+
             trackDataMap[item.habitId._id] = item;
           });
+
           SetHabitTrackData(trackDataMap);
         }
+
       } catch (error) {
         if (error.response) {
           console.log("Status:", error.response.status);
@@ -52,32 +63,10 @@ function Hero() {
         }
       }
     };
+
     fetchHabits();
     fetchTrackData();
   }, []);
-
-  // useEffect(() => {
-  //   const todayDate = new Date().toISOString().split("T")[0];
-  //   const fetchTrackData = async () => {
-  //     try {
-  //       const response = await axios.get(`/api/app/habit/tracking/${todayDate}`);
-  //       if (response.data.success) {
-  //         const trackingData = response.data.TrackData;
-  //         const trackDataMap = {};
-  //         trackingData.forEach((item) => {
-  //           trackDataMap[item.habitId._id] = item;
-  //         });
-  //         SetHabitTrackData(trackDataMap);
-  //       }
-  //     } catch (error) {
-  //       if (error.response) {
-  //         console.log("Status:", error.response.status);
-  //         console.log("Backend Message:", error.response.data.message);
-  //         console.log("Full Backend Data:", error.response.data);
-  //       }
-  //     }
-  //   }
-  // }, []);
 
   let CancelMode = () => {
     SetHabitMode("");
@@ -215,6 +204,7 @@ function Hero() {
 
         const ressponseHabit = response.data.Habit;
         SetAllHabits((prev) => [...prev, ressponseHabit]);
+        console.log(response.data.Habit._id);
         createTrackData(response.data.Habit._id, "pending");
         ResetHabitData();
         CancelMode();

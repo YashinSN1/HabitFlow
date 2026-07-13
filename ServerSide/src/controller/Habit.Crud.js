@@ -119,12 +119,15 @@ export const GetMyHabits = async (req, res) => {
       });
     }
 
+
     return res.status(200).json({
       success: true,
       habits: habits,
       count: habits.length,
       userId: userId,
     });
+
+    console.log("Fetched Habits:", habits);
   } catch (error) {
     let errorMessage = "Error fetching habits";
     let errorReference = "Habit_Fetch_Error";
@@ -201,15 +204,14 @@ export const UpdateMyHabit = async (req, res) => {
     }
   } catch (error) {
     let errorMessage = "Error updating habit";
-
+    let errorReference = "HABIT_UPDATE_ERROR";
   }
 };
 
 export const DeleteHabit = async (req, res) => {
   try {
     const authUser = req.user;
-    const habitId =
-      req.params?.habitId || req.body?.habitId || req.body?.HabitId;
+    const habitId = req.params?.habitId || req.body?.habitId || req.body?.HabitId;
 
     if (!habitId) {
       return res.status(400).json({
@@ -273,7 +275,7 @@ export const DeleteHabit = async (req, res) => {
       });
     }
 
-    await HabitTracking.deleteMany({ habitId: habitId });
+    await HabitTracking.deleteMany({ userId: authUser.id, habitId: habitId });
 
     const result = await Habit.deleteOne({
       _id: habitId,
