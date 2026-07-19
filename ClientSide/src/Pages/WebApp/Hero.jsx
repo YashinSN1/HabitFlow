@@ -36,7 +36,7 @@ function Hero() {
         if (response.data.success) {
           const trackingData = response.data.TrackData;
           const trackDataMap = {};
-          
+
           trackingData.forEach((item) => {
             if (!item.habitId) {
               console.warn("Skipping orphaned tracking record:", item._id);
@@ -47,6 +47,9 @@ function Hero() {
           });
 
           SetHabitTrackData(trackDataMap);
+        } else {
+          const HabitId = response.data?.habitId;
+          deleteHabit(HabitId);
         }
 
       } catch (error) {
@@ -124,11 +127,13 @@ function Hero() {
 
   const createTrackData = async (habitId, status) => {
     try {
+
       const response = await axios.post(
         `/api/app/habit/createTracking/${habitId}`,
         {
           date: todayDate,
           type: "create",
+          status: status,
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -142,6 +147,7 @@ function Hero() {
           [habitId]: response.data.TrackData,
         }));
       } else {
+        deleteHabit(habitId);
         console.log("Failed to create/update tracking data");
       }
     } catch (error) {
@@ -200,12 +206,12 @@ function Hero() {
         },
       );
       if (response.data.success) {
-        alert("Habit Created Successfully");
+        createTrackData(response.data.Habit._id, "pending");
 
+        alert("Habit Created Successfully");
         const ressponseHabit = response.data.Habit;
         SetAllHabits((prev) => [...prev, ressponseHabit]);
         console.log(response.data.Habit._id);
-        createTrackData(response.data.Habit._id, "pending");
         ResetHabitData();
         CancelMode();
       }
@@ -248,23 +254,27 @@ function Hero() {
     await editInBackend();
   };
 
-  let deleteInBackend = async () => {
-    if (!HabitId) return;
+
+  let deleteInBackend = async (DeleteHabitId) => {
+    const idToDelete = DeleteHabitId || HabitId;
+    if (!idToDelete) return;
 
     try {
-      let response = await axios.delete(`/api/app/habits/${HabitId}`);
+      let response = await axios.delete(`/api/app/habits/${idToDelete}`);
+
     } catch (error) {
       console.error("Error deleting habit:", error.response);
       alert("Error deleting habit");
     }
   };
 
-  let deleteHabit = async () => {
-    if (!HabitId) return;
+  let deleteHabit = async (DeleteHabitId) => {
+    const idToDelete = DeleteHabitId || HabitId;
+    if (!idToDelete) return;
 
-    SetAllHabits((prev) => prev.filter((habit) => habit._id !== HabitId));
+    SetAllHabits((prev) => prev.filter((habit) => habit._id !== idToDelete));
 
-    await deleteInBackend();
+    await deleteInBackend(DeleteHabitId);
 
     ResetHabitData();
     CancelMode();

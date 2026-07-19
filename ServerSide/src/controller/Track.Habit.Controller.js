@@ -9,8 +9,8 @@ export const TrackHabitRecord = async (req, res) => {
   try {
     const Habitid = req.params.Habitid;
     const Userid = req.user.id;
-
-    const { type } = req.body;
+  
+    const { type, date, status } = req.body;
 
     const UserExist = await User.findById(Userid);
 
@@ -45,6 +45,7 @@ export const TrackHabitRecord = async (req, res) => {
       habitId: Habitid,
       date: date,
       type: type,
+      status: status,
     });
 
     await newHabitTracking.save();
@@ -74,6 +75,7 @@ export const TrackHabitRecord = async (req, res) => {
 
 export const GetHabitTrackingData = async (req, res) => {
   try {
+
     const Userid = req.user.id;
     const UserExist = await User.findById(Userid);
     const { HabitTrackDate } = req.params;
@@ -94,7 +96,14 @@ export const GetHabitTrackingData = async (req, res) => {
         userId: Userid,
         date: { $gte: startOfDay, $lte: endOfDay },
         type: "log",
-      }).populate("habitId", "title priority status");
+      }).populate("habitId", "title priority");
+
+      // self note: populate() is used on fields that store a reference (ObjectId) to
+      // another collection - here, habitId points to a doc in Habit. It runs a lookup
+      // using that ID, fetches the specified fields ("title priority") from the
+      // referenced Habit doc, and replaces the ID with the actual object in the result.
+      // It does NOT touch or add any other field - fields like "status" that already
+      // exist directly on HabitTracking are untouched, since they aren't references.
 
       if (!trackingData || trackingData.length === 0) {
         return res.status(200).json({
@@ -108,7 +117,7 @@ export const GetHabitTrackingData = async (req, res) => {
         success: true,
         message: "Habit tracking data retrieved successfully",
         TrackData: trackingData,
-      });  //till here logic is working backend is sending me data but in frontend it is not showing data in console.log
+      });
     }
 
     const { startOfDay, endOfDay } = getDayRange(HabitTrackDate);
@@ -117,7 +126,7 @@ export const GetHabitTrackingData = async (req, res) => {
       userId: Userid,
       date: { $gte: startOfDay, $lte: endOfDay },
       type: "log",
-    }).populate("habitId", "title priority status");
+    }).populate("habitId", "title priority");
 
     const eligibleHabits = await Habit.find({
       user_id: Userid,
@@ -132,7 +141,7 @@ export const GetHabitTrackingData = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Habit tracking data retrieved successfully",
-        TrackData: defaultTrackData, 
+        TrackData: defaultTrackData,
       });
     }
 

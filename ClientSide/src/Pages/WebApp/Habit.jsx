@@ -190,7 +190,7 @@ function Habit({
               className={`${CurrentMode === "Edit" ? "justify-between" : "justify-end"} flex gap-3 pt-1`}
             >
               <button
-                onClick={deleteHabit}
+                onClick={() => deleteHabit(HabitData._id)}
                 className={`${CurrentMode === "Edit" ? "block" : "hidden"} bg-black px-5 py-2.5 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-200`}
               >
                 <img className="w-5" src={assets.bin} alt="Delete" /> Delete

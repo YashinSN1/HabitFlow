@@ -210,9 +210,10 @@ export const UpdateMyHabit = async (req, res) => {
 
 export const DeleteHabit = async (req, res) => {
   try {
+
     const authUser = req.user;
     const habitId = req.params?.habitId || req.body?.habitId || req.body?.HabitId;
-
+    let result;
     if (!habitId) {
       return res.status(400).json({
         success: false,
@@ -254,9 +255,15 @@ export const DeleteHabit = async (req, res) => {
     const isPrivileged = ["admin", "moderator", "user"].includes(user.role);
 
     if (isPrivileged) {
-      await HabitTracking.deleteMany({ habitId: habitId, user_id: authUser.id });
 
-      const result = await Habit.deleteOne({ _id: habitId });
+      const TrackingRecordExist = await HabitTracking.find({ habitId: habitId, userId: authUser.id });
+
+      if (TrackingRecordExist.length > 0) {
+        await HabitTracking.deleteMany({ habitId: habitId, userId: authUser.id });
+        result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+      } else {
+        result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+      }
 
       if (result.deletedCount === 0) {
         return res.status(404).json({
@@ -275,13 +282,20 @@ export const DeleteHabit = async (req, res) => {
       });
     }
 
-    await HabitTracking.deleteMany({ userId: authUser.id, habitId: habitId });
+    const TrackingRecordExist = await HabitTracking.find({ habitId: habitId, userId: authUser.id });
 
-    const result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+    if (TrackingRecordExist.length > 0) {
+      await HabitTracking.deleteMany({ habitId: habitId, userId: authUser.id });
+      result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+    } else {
+      result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+    }
 
+    //self note: deleteOne return a promise acknowledged and deletedCount properties,acknowledged indicates if the operation was acknowledged by the server, and deletedCount indicates how many documents were deleted.
+    //  If no documents were deleted, it means either the habit does not exist or the user does not have permission to delete it.
 
     if (result.deletedCount === 0) {
-      const exists = await Habit.exists({ _id: habitId });
+      const exists = await Habit.exists({ _id: habitId, user_id: authUser.id });
       if (!exists) {
         return res.status(404).json({
           success: false,
