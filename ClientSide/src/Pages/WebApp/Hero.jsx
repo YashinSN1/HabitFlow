@@ -289,7 +289,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full h-full bg-yellow-200 flex items-center justify-center px-3">
+      <div className="w-full h-full bg-yellow-200 flex flex-col-reverse items-center justify-center px-3">
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}
@@ -300,7 +300,8 @@ function Hero() {
           deleteHabit={deleteHabit}
         />
 
-        <div className="w-full h-12/13 bg-red-400 rounded-xl px-4 py-5 overflow-y-auto">
+
+        <div className="w-full h-fit bg-red-400 rounded-xl px-4 py-5 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold">Your Habit Today</h1>
             <button

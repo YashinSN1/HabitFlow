@@ -4,9 +4,11 @@ import React from "react";
 import axios from "axios";
 import { Outlet } from "react-router-dom";
 import { useEffect } from "react";
+import MobileNav from "./MobileNav.jsx";
+
 function Product() {
   let [ismenuclicked, setIsMenuClicked] = React.useState(false);
-  
+
   function handleMenuClick() {
     setIsMenuClicked(!ismenuclicked);
   }
@@ -16,10 +18,12 @@ function Product() {
       <div className="w-full h-full flex flex-col">
         <ProductNavbar handleMenuClick={handleMenuClick}></ProductNavbar>
         <div className="flex w-full h-full">
+          <MobileNav />
           <Sidebar MenuClicked={ismenuclicked}></Sidebar>
           <Outlet />
         </div>
       </div>
+
     </div>
   );
 }
