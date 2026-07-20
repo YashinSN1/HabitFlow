@@ -3,13 +3,13 @@ import User from "../models/User.js";
 import HabitTracking from "../models/Habit.Tracking.js";
 import { getDayRange } from "../utils/getDayRange.js";
 import { buildDefaultTrackEntry } from "../utils/buildDefaultTrackEntry.js";
-
+import { DateTime } from "luxon";
 
 export const TrackHabitRecord = async (req, res) => {
   try {
     const Habitid = req.params.Habitid;
     const Userid = req.user.id;
-  
+
     const { type, date, status } = req.body;
 
     const UserExist = await User.findById(Userid);
@@ -73,12 +73,12 @@ export const TrackHabitRecord = async (req, res) => {
   }
 };
 
+
 export const GetHabitTrackingData = async (req, res) => {
   try {
-
     const Userid = req.user.id;
     const UserExist = await User.findById(Userid);
-    const { HabitTrackDate } = req.params;
+    const { selectedDay, timezone } = req.query;
 
     if (!UserExist) {
       return res.status(404).json({
@@ -88,9 +88,17 @@ export const GetHabitTrackingData = async (req, res) => {
       });
     }
 
-    if (!HabitTrackDate) {
-      const today = new Date().toISOString().split("T")[0];
-      const { startOfDay, endOfDay } = getDayRange(today);
+    if (!timezone) {
+      return res.status(400).json({
+        success: false,
+        message: "timezone is required",
+      });
+    }
+
+    if (!selectedDay) {
+      const today = DateTime.now().setZone(timezone).toISODate();
+      
+      const { startOfDay, endOfDay } = getDayRange(today, timezone);
 
       const trackingData = await HabitTracking.find({
         userId: Userid,
@@ -120,7 +128,7 @@ export const GetHabitTrackingData = async (req, res) => {
       });
     }
 
-    const { startOfDay, endOfDay } = getDayRange(HabitTrackDate);
+    const { startOfDay, endOfDay } = getDayRange(selectedDay, timezone);
 
     const trackingData = await HabitTracking.find({
       userId: Userid,
@@ -153,14 +161,11 @@ export const GetHabitTrackingData = async (req, res) => {
       .filter((habit) => !trackedHabitIds.has(habit._id.toString()))
       .map((habit) => buildDefaultTrackEntry(habit, startOfDay, Userid));
 
-
-
     return res.status(200).json({
       success: true,
       message: "Habit tracking data retrieved successfully",
       TrackData: [...trackingData, ...missingHabitEntries],
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,

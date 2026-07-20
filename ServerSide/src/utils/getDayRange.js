@@ -1,9 +1,14 @@
-export const getDayRange = (dateString) => {
-    const startOfDay = new Date(dateString);
-    startOfDay.setUTCHours(0, 0, 0, 0);
+import { DateTime } from "luxon";
 
-    const endOfDay = new Date(dateString);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+export const getDayRange = (dateString, timezone) => {
+    const dt = DateTime.fromISO(dateString, { zone: timezone });
+
+    if (!dt.isValid) {
+        throw new Error(`Invalid date/timezone: ${dateString} / ${timezone}`);
+    }
+
+    const startOfDay = dt.startOf("day").toUTC().toJSDate();
+    const endOfDay = dt.endOf("day").toUTC().toJSDate();
 
     return { startOfDay, endOfDay };
 };

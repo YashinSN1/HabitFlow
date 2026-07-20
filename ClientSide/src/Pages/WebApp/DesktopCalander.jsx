@@ -29,7 +29,12 @@ export function DesktopCalander() {
   useEffect(() => {
     const fetchTrackData = async () => {
       try {
-        const response = await axios.get(`/api/app/habit/tracking/${selectedDay}`);
+        const response = await axios.get(`/api/app/habit/tracking`, {
+          params: {
+            selectedDay: selectedDay,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          },
+        });
         if (response.data.success) {
           SetAllHabits(response.data.TrackData);
         }

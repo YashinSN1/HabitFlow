@@ -32,7 +32,14 @@ function Hero() {
 
     const fetchTrackData = async () => {
       try {
-        const response = await axios.get("/api/app/habit/tracking");
+        const getTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const response = await axios.get("/api/app/habit/tracking",
+          {
+            params: {
+              timezone: getTimezone
+            }
+          }
+        );
         if (response.data.success) {
           const trackingData = response.data.TrackData;
           const trackDataMap = {};
