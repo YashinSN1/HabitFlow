@@ -1,6 +1,6 @@
 :: upcoming features ::
 
-calendar = [pending]:
+calendar = [50% complete mobile one is left]:
 
 on mobile it will be a vertical list showing 30 past days and 7 upcoming days
 on desktop it will be a month grid with a detail panel on the right side
