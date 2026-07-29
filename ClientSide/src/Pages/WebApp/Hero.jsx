@@ -3,6 +3,7 @@ import Habit from "./Habit.jsx";
 import React from "react";
 import assets from "@/assets/assets.js";
 import axios from "axios";
+import MobileNav from "./MobileNav.jsx";
 
 function Hero() {
   const [HabitMode, SetHabitMode] = useState("");
@@ -289,7 +290,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full h-full bg-yellow-200 flex flex-col-reverse items-center justify-center px-3">
+      <div className="w-full h-full py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}
@@ -301,7 +302,7 @@ function Hero() {
         />
 
 
-        <div className="w-full h-fit bg-red-400 rounded-xl px-4 py-5 overflow-y-auto">
+        <div className="w-full h-fit min-h-[88%]  lg:m-auto bg-red-400 rounded-xl px-4 py-3">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold">Your Habit Today</h1>
             <button
@@ -315,7 +316,7 @@ function Hero() {
             </button>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col w-full h-full gap-3">
             {AllHabits.length > 0 ? (
               AllHabits.map((habit) => (
                 <div
@@ -369,6 +370,7 @@ function Hero() {
           </div>
         </div>
       </div>
+
     </>
   );
 }
