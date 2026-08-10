@@ -290,7 +290,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full h-full py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
+      <div className="w-full h-fit py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}

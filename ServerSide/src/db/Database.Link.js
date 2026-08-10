@@ -5,7 +5,7 @@ import dns from 'dns'
 dotenv.config()
 
 dns.setDefaultResultOrder('ipv4first')
-dns.promises.setServers(['8.8.8.8', '1.1.1.1'])  // this prevent dns issue by forcing it ran into some windwos dns issue that cause the connection to fail
+dns.promises.setServers(['8.8.8.8', '1.1.1.1'])  // this prevent dns issue by forcing it ,ran into some windwos dns issue that cause the connection to fail
 
 const ConnectDb = async () => {
     const maxRetries = 3;
