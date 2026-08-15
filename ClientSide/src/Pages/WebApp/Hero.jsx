@@ -290,7 +290,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full h-fit py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
+      <div className="w-full relative h-fit py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}
@@ -303,16 +303,16 @@ function Hero() {
 
 
         <div className="w-full h-fit min-h-[88%]  lg:m-auto bg-red-400 rounded-xl px-4 py-3">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold">Your Habit Today</h1>
+          <div className="flex w-full h-full gap-5 items-center justify-between mb-4">
+            <h1 className=" w-full text-xl font-semibold">Your Habit Today</h1>
             <button
               onClick={() => {
                 SetHabitMode("Create");
                 ResetHabitData();
               }}
-              className="bg-red-500 text-white px-4 py-2 rounded-md"
+              className="bg-red-500 text-white py-2 max-w-50 w-full px-3 md:px-4 md:py-2 rounded-md"
             >
-              Create Your Habit
+              Create Habit
             </button>
           </div>
 

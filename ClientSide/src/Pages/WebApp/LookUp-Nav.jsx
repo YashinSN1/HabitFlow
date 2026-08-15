@@ -3,7 +3,7 @@ import assets from '@/assets/assets.js';
 function LookUpNav() {
     return (
         <>
-            <div className=" justify-center border-b bg-white flex py-1.5 itmes-center justify-end h-full gap-4 px-5 w-full">
+            <div className=" border-b bg-white flex py-1.5 itmes-center justify-end h-full gap-4 px-5 w-full">
 
                 <div className="flex items-center gap-2 px-3 border-2 transition-colors hover:border-red-500 border-red-100 rounded-md h-full w-full min-w-[10vw] max-w-xl bg-white">
                     <div className="flex items-center justify-center">
