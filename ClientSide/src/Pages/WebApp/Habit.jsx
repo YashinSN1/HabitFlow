@@ -198,7 +198,7 @@ function Habit({
             >
               <button
                 onClick={() => deleteHabit(HabitData._id)}
-                className={`${CurrentMode === "Edit" ? "block" : "hidden"} bg-black text-white rounded-xl text-sm font-bold py-[4%] max-h-20 max-w-30 px-[3%] hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-200`}
+                className={`${CurrentMode === "Edit" ? "block" : "hidden"} bg-black text-white rounded-xl text-sm font-bold py-[3%] max-h-20 max-w-30 px-[3%] hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-200`}
               >
                 <img className="w-[25%]" src={assets.bin} alt="Delete" />
                 Delete
@@ -206,7 +206,7 @@ function Habit({
 
                 <button
                   onClick={CreateOrEdit}
-                  className="py-[5%] max-h-20 max-w-40 px-[3%] bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors shadow-md shadow-red-200"
+                  className="py-[3%] max-h-20 max-w-40 px-[3%] bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors shadow-md shadow-red-200"
                 >
                   {CurrentMode === "Edit"
                     ? "Edit Habit"
