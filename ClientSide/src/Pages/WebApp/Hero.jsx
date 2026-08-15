@@ -4,6 +4,7 @@ import React from "react";
 import assets from "@/assets/assets.js";
 import axios from "axios";
 import MobileNav from "./MobileNav.jsx";
+import { DateTime } from "luxon";
 
 function Hero() {
   const [HabitMode, SetHabitMode] = useState("");
@@ -24,7 +25,6 @@ function Hero() {
         }
 
         SetAllHabits(GetHabit.data.habits);
-
       } catch (error) {
         console.error("Error fetching habits:", error.message);
         console.log("Error fetching habits");
@@ -34,24 +34,23 @@ function Hero() {
     const fetchTrackData = async () => {
       try {
         const getTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const response = await axios.get("/api/app/habit/tracking",
-          {
-            params: {
-              timezone: getTimezone
-            }
-          }
-        );
+        const response = await axios.get("/api/app/habit/tracking", {
+          params: {
+            timezone: getTimezone,
+          },
+        });
+
         if (response.data.success) {
           const trackingData = response.data.TrackData;
           const trackDataMap = {};
-
           trackingData.forEach((item) => {
-            if (!item.habitId) {
+            if (!item._id) {
               console.warn("Skipping orphaned tracking record:", item._id);
               return;
             }
 
             trackDataMap[item.habitId._id] = item;
+            console.log(trackDataMap);
           });
 
           SetHabitTrackData(trackDataMap);
@@ -59,7 +58,6 @@ function Hero() {
           const HabitId = response.data?.habitId;
           deleteHabit(HabitId);
         }
-
       } catch (error) {
         if (error.response) {
           console.log("Status:", error.response.status);
@@ -85,7 +83,6 @@ function Hero() {
     SetHabitId("");
   };
 
-
   let [HabitData, SetHabitData] = React.useState({
     HabitId: "",
     title: "",
@@ -104,38 +101,72 @@ function Hero() {
     },
     reminder: false,
   });
-
+  
   const toggleStatus = async (habitId) => {
-    if (isLoading[habitId]) return;
+  if (isLoading[habitId]) return;
 
-    const currentStatus = HabitTrackData[habitId]?.status || "pending";
-    let newStatus;
-    if (currentStatus === "pending") newStatus = "completed";
-    else if (currentStatus === "completed") newStatus = "skipped";
-    else newStatus = "pending";
-    SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
+  const currentStatus = HabitTrackData[habitId]?.status || "pending";
 
-    try {
-      const response = await axios.patch(
-        `/api/app/habit/updateTracking/${habitId}`,
-        { status: newStatus, date: todayDate, type: "log" },
-        { headers: { "Content-Type": "application/json" } },
-      );
-      if (response.data.success) {
-        let newHabitTrackData = { ...HabitTrackData, [habitId]: { status: newStatus } };
-        SetHabitTrackData(newHabitTrackData);
-      }
+  let newStatus;
 
-    } catch (error) {
-      console.error("Error updating tracking data:", error.response);
-    } finally {
-      SetIsLoading((prev) => ({ ...prev, [habitId]: false }));
+  if (currentStatus === "pending") {
+    newStatus = "completed";
+  } else if (currentStatus === "completed") {
+    newStatus = "skipped";
+  } else {
+    newStatus = "pending";
+  }
+
+  SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
+
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const localDate = DateTime.now()
+      .setZone(timezone)
+      .toISODate();
+
+    const response = await axios.patch(
+      `/api/app/habit/updateTracking/${habitId}`,
+      {
+        status: newStatus,
+        date: localDate,
+        timezone,
+        type: "log",
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (response.data.success) {
+      console.log(response.data);
+
+      SetHabitTrackData((prev) => ({
+        ...prev,
+        [habitId]: {
+          ...prev[habitId],
+          status: newStatus,
+        },
+      }));
     }
-  };
+  } catch (error) {
+    console.error(
+      "Error updating tracking data:",
+      error.response?.data || error
+    );
+  } finally {
+    SetIsLoading((prev) => ({
+      ...prev,
+      [habitId]: false,
+    }));
+  }
+};
 
   const createTrackData = async (habitId, status) => {
     try {
-
       const response = await axios.post(
         `/api/app/habit/createTracking/${habitId}`,
         {
@@ -149,7 +180,6 @@ function Hero() {
       );
 
       if (response.data.success) {
-
         SetHabitTrackData((prev) => ({
           ...prev,
           [habitId]: response.data.TrackData,
@@ -225,7 +255,6 @@ function Hero() {
       }
     } catch (error) {
       console.error("Error response:", error.response);
-
     }
   };
 
@@ -262,14 +291,12 @@ function Hero() {
     await editInBackend();
   };
 
-
   let deleteInBackend = async (DeleteHabitId) => {
     const idToDelete = DeleteHabitId || HabitId;
     if (!idToDelete) return;
 
     try {
       let response = await axios.delete(`/api/app/habits/${idToDelete}`);
-
     } catch (error) {
       console.error("Error deleting habit:", error.response);
       alert("Error deleting habit");
@@ -290,7 +317,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full relative h-fit py-3 bg-yellow-200 flex flex-col items-start justify-center px-3">
+      <div className="w-full relative min-h-screen py-6 bg-white flex flex-col items-start justify-start px-4 md:px-8">
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}
@@ -301,16 +328,17 @@ function Hero() {
           deleteHabit={deleteHabit}
         />
 
-
-        <div className="w-full h-fit min-h-[88%]  lg:m-auto bg-red-400 rounded-xl px-4 py-3">
-          <div className="flex w-full h-full gap-5 items-center justify-between mb-4">
-            <h1 className=" w-full text-xl font-semibold">Your Habit Today</h1>
+        <div className="w-full h-fit min-h-[88%] max-w-5xl lg:m-auto bg-white border border-gray-100 rounded-2xl px-4 md:px-6 py-5 shadow-sm">
+          <div className="flex w-full h-full gap-5 items-center justify-between mb-5 flex-wrap">
+            <h1 className="text-xl md:text-2xl font-black text-black">
+              Your Habits Today
+            </h1>
             <button
               onClick={() => {
                 SetHabitMode("Create");
                 ResetHabitData();
               }}
-              className="bg-red-500 text-white py-2 max-w-50 w-full px-3 md:px-4 md:py-2 rounded-md"
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 max-w-50 w-full sm:w-auto px-4 rounded-xl transition-colors shadow-sm shadow-red-200"
             >
               Create Habit
             </button>
@@ -325,14 +353,14 @@ function Hero() {
                     SetHabitId(() => habit._id);
                     handleHabitClick(habit._id);
                   }}
-                  className="w-full bg-white rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="w-full bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:border-red-200 hover:bg-red-50/30 transition-colors"
                 >
-                  <div
-                    className={` flex items-center justify-between border-b pb-3`}
-                  >
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-lg">{habit.title}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-bold text-base md:text-lg text-black">
+                        {habit.title}
+                      </p>
+                      <p className="text-sm text-gray-400">
                         {typeof habit.category === "object"
                           ? habit.category.name
                           : habit.category}
@@ -345,15 +373,15 @@ function Hero() {
                           e.stopPropagation();
                           toggleStatus(habit._id);
                         }}
-                        className=" border border-gray-300 text-black px-3 py-3 rounded-xl hover:bg-gray-100"
+                        className="border-2 border-gray-100 text-black w-11 h-11 flex items-center justify-center rounded-xl hover:border-red-300 transition-colors"
                       >
-                        {HabitTrackData[habit._id]?.status === "completed" && HabitTrackData[habit._id]?.status !== "skipped" && HabitTrackData[habit._id]?.status !== "pending" ? (
+                        {HabitTrackData[habit._id]?.status === "completed" ? (
                           <img
-                            className="w-5"
+                            className="w-5 text-red-500"
                             src={assets.checkmark}
                             alt="checked"
                           />
-                        ) : HabitTrackData[habit._id]?.status === "skipped" && HabitTrackData[habit._id]?.status !== "completed" && HabitTrackData[habit._id]?.status !== "pending" ? (
+                        ) : HabitTrackData[habit._id]?.status === "skipped" ? (
                           <img className="w-5" src={assets.cross} alt="cross" />
                         ) : null}
                       </button>
@@ -362,15 +390,14 @@ function Hero() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-10 text-white opacity-80">
-                No habits found start by creaiting your first habit and it will
+              <div className="text-center py-16 text-gray-400">
+                No habits found — start by creating your first habit and it will
                 appear here.
               </div>
             )}
           </div>
         </div>
       </div>
-
     </>
   );
 }

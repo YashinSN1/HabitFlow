@@ -14,13 +14,13 @@ function Product() {
     setIsMenuClicked(!ismenuclicked);
   }
   return (
-    <div className="w-screen h-screen flex flex-col">
+    <div className="h-full w-full flex flex-col">
       <ProductNavbar handleMenuClick={handleMenuClick} />
 
-      <div className="flex w-full overflow-auto relative">
+      <div className="flex w-full h-full overflow-auto relative">
         <Sidebar MenuClicked={ismenuclicked} />
 
-        <div className="flex-1 lg:overflow-hidden overflow-y-auto pb-20">
+        <div className="flex-1 lg:overflow-hidden overflow-y-auto h-full w-full pb-20">
           <Outlet />
         </div>
       </div>

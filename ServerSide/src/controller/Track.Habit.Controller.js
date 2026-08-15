@@ -73,7 +73,6 @@ export const TrackHabitRecord = async (req, res) => {
   }
 };
 
-
 export const GetHabitTrackingData = async (req, res) => {
   try {
     const Userid = req.user.id;
@@ -97,7 +96,7 @@ export const GetHabitTrackingData = async (req, res) => {
 
     if (!selectedDay) {
       const today = DateTime.now().setZone(timezone).toISODate();
-      
+
       const { startOfDay, endOfDay } = getDayRange(today, timezone);
 
       const trackingData = await HabitTracking.find({
@@ -175,22 +174,39 @@ export const GetHabitTrackingData = async (req, res) => {
   }
 };
 
-
 export const UpdateHabitTrackingRecord = async (req, res) => {
   try {
     let userId = req.user.id;
     const UserExist = await User.findById(userId);
     let habitId = req.params.Habitid;
     const HabitExists = await Habit.findById(habitId);
-    const { status, notes, LogReason, date, type } = req.body;
+    const { status, notes, LogReason, date, timezone, type } = req.body;
+
+    if (!timezone) {
+      return res.status(400).json({
+        success: false,
+        message: "timezone is required",
+      });
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: "date is required",
+      });
+    }
+
+    const { startOfDay, endOfDay } = getDayRange(date, timezone);
 
     const trackRecordExists = await HabitTracking.findOne({
-      userId: userId,
-      habitId: habitId,
-      date: date,
-      type: type,
+      userId,
+      habitId,
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+      type,
     });
-
 
     if (!UserExist) {
       return res.status(404).json({
@@ -220,23 +236,36 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
 
     if (!trackRecordExists) {
       const createdTrackRecord = new HabitTracking({
-        userId: userId,
-        habitId: habitId,
-        date: date,
-        status: status,
-        notes: notes,
-        type: type,
+        userId,
+        habitId,
+        date: startOfDay,
+        status,
+        notes,
+        type,
         logReason: LogReason,
       });
+
       await createdTrackRecord.save();
     }
-
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
-      { userId: userId, habitId: habitId, date: date, type: type },
-      { status: status, notes: notes, logReason: LogReason, },
-      { new: true },
+      {
+        userId,
+        habitId,
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+        type,
+      },
+      {
+        status,
+        notes,
+        logReason: LogReason,
+      },
+      {
+        new: true,
+      },
     );
-
     return res.status(200).json({
       success: true,
       message: "Habit tracking record updated successfully",

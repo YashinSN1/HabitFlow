@@ -24,7 +24,7 @@ function MobileNav() {
                             onClick={() => navigate(item.path)}
                             className={`flex flex-col items-center justify-center flex-1 h-full relative transition-colors duration-200 ${
                                 isActive 
-                                    ? "text-blue-600" 
+                                    ? "text-red-600" 
                                     : "text-gray-500 hover:text-gray-700"
                             }`}
                         >
@@ -41,7 +41,7 @@ function MobileNav() {
                             </span>
                             
                             {isActive && (
-                                <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-blue-600 rounded-full" />
+                                <div className="absolute -top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-red-600 rounded-full" />
                             )}
                         </button>
                     );

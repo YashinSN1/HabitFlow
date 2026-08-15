@@ -20,7 +20,8 @@ function Habit({
   const frequencyDefault = () => {
     const type = HabitData?.frequency?.frequencyType;
     const days = HabitData?.frequency?.days || [];
-    const DaysInMonths = HabitData?.frequency?.DaysInMonths || [];
+    const DaysInMonths = HabitData?.frequency?.months?.DaysInMonths || [];
+
     if (!type) return "Not set";
     if (type === "Monthly") {
       if (DaysInMonths.length === 0) return "Monthly - no days set";
@@ -69,27 +70,27 @@ function Habit({
         />
       )}
 
-      <div className="absolute w-full h-full inset-0 flex items-center justify-center p-4 ">
-        <div
-          className="bg-white w-full max-w-lg rounded-2xl shadow-2xl h-full overflow-y-auto"
-          style={{ border: "1.5px solid #fee2e2" }}
-        >
-          <div className="bg-red-500 px-6 py-5 flex items-center justify-between w-full h-fullrounded-t-2xl">
-            <h2 className="text-white text-2xl font-black tracking-tight">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ background: "rgba(0,0,0,0.6)" }}
+      >
+        <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="px-6 py-5 flex items-center justify-between shrink-0 border-b border-gray-100">
+            <h2 className="text-black text-xl md:text-2xl font-black tracking-tight">
               {CurrentMode === "Create" ? "Create Habit" : "Edit Habit"}
             </h2>
 
             <button
               onClick={CancelMode}
-              className="rounded-xl bg-red-300"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 transition-colors shrink-0"
             >
-              <img src={assets.cross} className="w-10 text-white h-10]" />
+              <img src={assets.cross} className="w-4 h-4" alt="close" />
             </button>
           </div>
 
-          <div className="p-6 flex flex-col gap-4 text-black">
+          <div className="p-6 flex flex-col gap-5 text-black overflow-y-auto">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold tracking-widest uppercase text-gray-500">
+              <label className="text-xs font-bold tracking-widest uppercase text-gray-400">
                 Title
               </label>
               <input
@@ -99,12 +100,12 @@ function Habit({
                   SetHabitData((prev) => ({ ...prev, title: e.target.value }))
                 }
                 value={HabitData.title}
-                className="h-11 border-2 border-red-100 rounded-xl px-4 outline-none focus:border-red-400 text-sm transition-colors"
+                className="h-11 border border-gray-200 rounded-xl px-4 outline-none focus:border-black text-sm transition-colors"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold tracking-widest uppercase text-gray-500">
+              <label className="text-xs font-bold tracking-widest uppercase text-gray-400">
                 Description
               </label>
               <textarea
@@ -116,12 +117,12 @@ function Habit({
                   }))
                 }
                 value={HabitData.description}
-                className="h-24 border-2 border-red-100 rounded-xl px-4 py-3 resize-none outline-none focus:border-red-400 text-sm transition-colors"
+                className="h-24 border border-gray-200 rounded-xl px-4 py-3 resize-none outline-none focus:border-black text-sm transition-colors"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold tracking-widest uppercase text-gray-500">
+              <label className="text-xs font-bold tracking-widest uppercase text-gray-400">
                 Priority{" "}
                 <span className="text-gray-300 normal-case font-normal">
                   (1 to 10)
@@ -139,18 +140,18 @@ function Habit({
                     priority: e.target.value,
                   }))
                 }
-                className="h-11 border-2 border-red-100 rounded-xl px-4 outline-none focus:border-red-400 text-sm transition-colors w-32"
+                className="h-11 border border-gray-200 rounded-xl px-4 outline-none focus:border-black text-sm transition-colors w-32"
               />
             </div>
 
             <div
               onClick={() => SetEditFrequency(true)}
-              className="border-2 border-dashed border-red-200 rounded-xl px-4 py-3 flex items-center justify-between bg-red-50"
+              className="cursor-pointer border border-gray-200 rounded-xl px-4 py-3.5 flex items-center justify-between hover:border-black transition-colors"
             >
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-3">
-                  <img src={assets.appcalander} className="w-5 h-5" />
-                  <span className="text-xs font-bold tracking-widest uppercase text-red-400">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <img src={assets.appcalander} className="w-4 h-4" />
+                  <span className="text-xs font-bold tracking-widest uppercase text-gray-400">
                     Frequency
                   </span>
                 </div>
@@ -161,8 +162,11 @@ function Habit({
               </div>
 
               <button
-                onClick={() => SetEditFrequency(true)}
-                className={` hidden sm:block  text-xs font-bold px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors tracking-wide`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  SetEditFrequency(true);
+                }}
+                className="hidden sm:block shrink-0 text-xs font-bold px-3.5 py-2 rounded-lg bg-red-500 text-white hover:bg-black transition-colors tracking-wide"
               >
                 Edit
               </button>
@@ -170,13 +174,12 @@ function Habit({
 
             <div
               onClick={() => SetEditCategory(true)}
-              className="border-2 border-dashed border-red-200 rounded-xl px-4 py-3 flex items-center justify-between bg-red-50"
+              className="cursor-pointer border border-gray-200 rounded-xl px-4 py-3.5 flex items-center justify-between hover:border-black transition-colors"
             >
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-3">
-                  <img src={assets.category} className="w-5 h-5" />
-
-                  <span className="text-xs font-bold tracking-widest uppercase text-red-400">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <img src={assets.category} className="w-4 h-4" />
+                  <span className="text-xs font-bold tracking-widest uppercase text-gray-400">
                     Category
                   </span>
                 </div>
@@ -186,33 +189,33 @@ function Habit({
                 </span>
               </div>
               <button
-                onClick={() => SetEditCategory(true)}
-                className={` hidden sm:block  text-xs font-bold px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors tracking-wide`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  SetEditCategory(true);
+                }}
+                className="hidden sm:block shrink-0 text-xs font-bold px-3.5 py-2 rounded-lg bg-red-500 text-white hover:bg-black transition-colors tracking-wide"
               >
                 Edit
               </button>
             </div>
 
             <div
-              className={`${CurrentMode === "Edit" ? "justify-between" : "justify-end"} w-full h-full items-center flex gap-3 pt-1`}
+              className={`${CurrentMode === "Edit" ? "justify-between" : "justify-end"} w-full items-center flex gap-3 pt-4 border-t border-gray-100`}
             >
               <button
                 onClick={() => deleteHabit(HabitData._id)}
-                className={`${CurrentMode === "Edit" ? "block" : "hidden"} bg-black text-white rounded-xl text-sm font-bold py-[3%] max-h-20 max-w-30 px-[3%] hover:bg-red-600 transition-colors flex items-center gap-2 shadow-md shadow-red-200`}
+                className={`${CurrentMode === "Edit" ? "flex" : "hidden"} items-center gap-2 bg-black text-white rounded-xl text-sm font-bold py-2.5 px-4 hover:bg-red-500 transition-colors`}
               >
-                <img className="w-[25%]" src={assets.bin} alt="Delete" />
+                <img className="w-4 h-4" src={assets.bin} alt="Delete" />
                 Delete
               </button>
 
-                <button
-                  onClick={CreateOrEdit}
-                  className="py-[3%] max-h-20 max-w-40 px-[3%] bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors shadow-md shadow-red-200"
-                >
-                  {CurrentMode === "Edit"
-                    ? "Edit Habit"
-                    : "Create Habit"}
-                </button>
-
+              <button
+                onClick={CreateOrEdit}
+                className="py-2.5 px-6 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-black transition-colors"
+              >
+                {CurrentMode === "Edit" ? "Edit Habit" : "Create Habit"}
+              </button>
             </div>
           </div>
         </div>

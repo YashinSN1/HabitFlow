@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 const PredefinedCategories = [
-  { id: "work", label: " Work", color: "#3b82f6" },
-  { id: "personal", label: "Personal", color: "#10b981" },
-  { id: "shopping", label: " Shopping", color: "#f59e0b" },
-  { id: "health", label: " Health", color: "#ef4444" },
-  { id: "finance", label: " Finance", color: "#8b5cf6" },
-  { id: "travel", label: "Travel", color: "#06b6d4" },
-  { id: "education", label: "Education", color: "#f97316" },
+  { id: "work", label: " Work", color: "#ef4444" },
+  { id: "personal", label: "Personal", color: "#000000" },
+  { id: "shopping", label: " Shopping", color: "#ef4444" },
+  { id: "health", label: " Health", color: "#000000" },
+  { id: "finance", label: " Finance", color: "#ef4444" },
+  { id: "travel", label: "Travel", color: "#000000" },
+  { id: "education", label: "Education", color: "#ef4444" },
 ];
 
 function CategorySelector({ onClose, HabitData, SetHabitData }) {
@@ -71,24 +71,16 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
   return (
     <div
       className="fixed inset-0 z-100 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(0,0,0,0.6)" }}
     >
-      <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
-        style={{
-          border: "1.5px solid #fee2e2",
-          fontFamily: "'Segoe UI', sans-serif",
-        }}
-      >
-        <div className="bg-red-500 px-5 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-white text-xl font-black tracking-tight">
-              Category
-            </h2>
-          </div>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+        <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
+          <h2 className="text-black text-lg font-black tracking-tight">
+            Category
+          </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-white transition-colors duration-150 text-sm font-bold"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-red-300 hover:text-white transition-colors text-gray-500 text-sm font-bold"
           >
             ✕
           </button>
@@ -107,31 +99,23 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
                 <button
                   key={categ.id}
                   onClick={() => categoryClick(categ)}
-                  className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 text-left"
+                  className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 text-left border"
                   style={{
-                    background: isSelected
-                      ? categ.color + "18"
+                    background: isSelected ? "#000000" : "#fafafa",
+                    borderColor: isSelected
+                      ? "#000000"
                       : isCustom
-                        ? "#fef2f2"
-                        : "#f3f4f6",
-                    border: isSelected
-                      ? `2px solid ${categ.color}`
-                      : isCustom
-                        ? "2px dashed #ef4444"
-                        : "2px solid transparent",
-                    color: isSelected
-                      ? categ.color
-                      : isCustom
-                        ? "black"
-                        : "#374151",
+                        ? "#d1d5db"
+                        : "#e5e7eb",
+                    borderStyle: isCustom && !isSelected ? "dashed" : "solid",
+                    color: isSelected ? "#ffffff" : "#374151",
                   }}
                 >
-                  <span className="text-base leading-none">
-                    {categ.label.split(" ")[0]}
-                  </span>
-                  <span className="truncate">
-                    {categ.label.split(" ").slice(1).join(" ")}
-                  </span>
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: isSelected ? "#ef4444" : categ.color }}
+                  />
+                  <span className="truncate">{categ.label.trim()}</span>
                 </button>
               );
             })}
@@ -141,7 +125,7 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
         <div className="px-4 pb-4">
           <button
             onClick={() => finalCategory()}
-            className="w-full py-3 rounded-xl bg-black text-white text-sm font-bold tracking-wider hover:bg-red-500 transition-colors duration-200"
+            className="w-full py-3 rounded-xl bg-red-500 text-white text-sm font-bold tracking-wider hover:bg-red-black transition-colors duration-200"
           >
             Save Category
           </button>
@@ -151,19 +135,16 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
       {showCustomUi && (
         <div
           className="absolute inset-0 z-60 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.35)" }}
+          style={{ background: "rgba(0,0,0,0.4)" }}
         >
-          <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden"
-            style={{ border: "1.5px solid #e5e7eb" }}
-          >
-            <div className="bg-red-500 px-5 py-3 flex items-center justify-between">
-              <h3 className="text-white text-sm font-bold tracking-tight">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden border border-gray-100">
+            <div className="px-5 py-3 flex items-center justify-between border-b border-gray-100">
+              <h3 className="text-black text-sm font-bold tracking-tight">
                 Custom Category
               </h3>
               <button
                 onClick={() => setShowCustomUi(false)}
-                className="text-white text-xs transition-colors"
+                className="text-gray-400 hover:text-black text-xs transition-colors"
               >
                 ✕
               </button>
@@ -174,12 +155,12 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
               </p>
               <input
                 type="text"
-                placeholder="eg. Grcoeries, Goals..."
+                placeholder="eg. Groceries, Goals..."
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveCustom()}
                 autoFocus
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 transition-all placeholder-gray-300"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-black transition-all placeholder-gray-300"
               />
               <div className="flex gap-2 mt-3">
                 <button
@@ -190,7 +171,7 @@ function CategorySelector({ onClose, HabitData, SetHabitData }) {
                 </button>
                 <button
                   onClick={handleSaveCustom}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors"
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-black transition-colors"
                 >
                   Confirm
                 </button>

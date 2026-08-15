@@ -13,7 +13,7 @@ const Frequency_Types = ["Daily", "Monthly"];
 function FrequencySelector({ HabitData, SetHabitData, onClose }) {
   const frequencyType = HabitData?.frequency?.frequencyType;
   const selectedDays = HabitData?.frequency?.days || [];
-  const selectedMonthDays = HabitData?.frequency?.DaysInMonths || [];
+  const selectedMonthDays = HabitData?.frequency?.months?.DaysInMonths || [];
 
   const setType = (type) => {
     SetHabitData((prev) => ({
@@ -46,7 +46,7 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
 
   const toggleMonthDay = (num) => {
     SetHabitData((prev) => {
-      const DaysInMonths = prev.frequency.months.DaysInMonths || []; 
+      const DaysInMonths = prev.frequency.months.DaysInMonths || [];
       return {
         ...prev,
         frequency: {
@@ -60,6 +60,7 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
       };
     });
   };
+  
   const toggleAll = (e) => {
     SetHabitData((prev) => ({
       ...prev,
@@ -75,37 +76,31 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
   return (
     <div
       className="fixed inset-0 z-100 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)" }}
+      style={{ background: "rgba(0,0,0,0.6)" }}
     >
-      <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
-        style={{ border: "1.5px solid #fee2e2" }}
-      >
-        <div className="bg-red-500 px-5 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-white text-xl font-black tracking-tight">
-              Frequency
-            </h2>
-          </div>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100">
+        <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
+          <h2 className="text-black text-lg font-black tracking-tight">
+            Frequency
+          </h2>
           <button
             onClick={onClose}
-            className="text-white opacity-70 hover:opacity-100 transition-opacity text-2xl font-light leading-none"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-red-300 hover:text-white transition-colors text-gray-500 text-lg font-light leading-none"
           >
-            x
+            ✕
           </button>
         </div>
 
         <div className="p-5 flex flex-col gap-5">
-          <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+          <div className="flex rounded-xl overflow-hidden border border-gray-200">
             {Frequency_Types.map((type) => (
               <button
                 key={type}
                 onClick={() => setType(type)}
                 className="flex-1 py-2.5 text-sm font-bold transition-all duration-200"
                 style={{
-                  background:
-                    frequencyType === type ? "#ef4444" : "transparent",
-                  color: frequencyType === type ? "#fff" : "#374151",
+                  background: frequencyType === type ? "#000000" : "#ffffff",
+                  color: frequencyType === type ? "#ffffff" : "#374151",
                 }}
               >
                 {type}
@@ -115,7 +110,7 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
 
           {frequencyType === "Daily" && (
             <div className="flex flex-col gap-3">
-              <label className="flex items-center justify-between border border-dashed border-red-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-red-50 transition-colors">
+              <label className="flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:border-black transition-colors">
                 <div>
                   <p className="text-sm font-bold text-black">Every Day</p>
                   <p className="text-xs text-gray-400">
@@ -143,13 +138,9 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
                       onClick={() => toggleDay(day)}
                       className="flex flex-col items-center py-2.5 px-1 rounded-xl text-xs font-bold tracking-wide transition-all duration-150 border"
                       style={{
-                        background: active ? "#ef4444" : "#fff",
-                        color: active ? "#fff" : "#374151",
-                        borderColor: active ? "#ef4444" : "#e5e7eb",
-                        boxShadow: active
-                          ? "0 2px 8px rgba(239,68,68,0.3)"
-                          : "none",
-                        transform: active ? "scale(1.05)" : "scale(1)",
+                        background: active ? "#ef4444" : "#ffffff",
+                        color: active ? "#ffffff" : "#374151",
+                        borderColor: active ? "#ffffff" : "#e5e7eb",
                       }}
                     >
                       {day.slice(0, 3).toUpperCase()}
@@ -160,8 +151,8 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
 
               {selectedDays.length > 0 && (
                 <p className="text-xs text-gray-400 text-center">
-                  {selectedDays.length} day{selectedDays.length > 1 ? "s" : ""}{" "}
-                  selected
+                  <span className="text-red-500 font-bold">{selectedDays.length}</span> day
+                  {selectedDays.length > 1 ? "s" : ""} selected
                 </p>
               )}
             </div>
@@ -189,13 +180,9 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
                       onClick={() => toggleMonthDay(num)}
                       className="flex items-center justify-center rounded-lg text-xs font-bold transition-all duration-150 border aspect-square"
                       style={{
-                        background: active ? "#ef4444" : "#fff",
-                        color: active ? "#fff" : "#374151",
-                        borderColor: active ? "#ef4444" : "#e5e7eb",
-                        boxShadow: active
-                          ? "0 2px 6px rgba(239,68,68,0.35)"
-                          : "none",
-                        transform: active ? "scale(1.08)" : "scale(1)",
+                        background: active ? "#ef4444" : "#ffffff",
+                        color: active ? "#ffffff" : "#374151",
+                        borderColor: active ? "#ffffff" : "#ffffff",
                       }}
                     >
                       {num}
@@ -214,7 +201,7 @@ function FrequencySelector({ HabitData, SetHabitData, onClose }) {
 
           <button
             onClick={onClose}
-            className="w-full py-3 rounded-xl bg-black text-white text-sm font-bold tracking-wider hover:bg-red-500 transition-colors duration-200"
+            className="w-full py-3 rounded-xl bg-red-500 text-white text-sm font-bold tracking-wider hover:bg-black transition-colors duration-200"
           >
             Save Frequency
           </button>
