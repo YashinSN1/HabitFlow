@@ -41,11 +41,7 @@ const AccentBar = ({ status }) => {
 };
 
 export function Calander() {
-  // Get the user's actual browser timezone.
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  // Generate today's calendar date in the user's timezone.
-  // DO NOT use new Date().toISOString() here because that is UTC.
   const today = DateTime.now().setZone(timezone).toISODate();
 
   const [selectedDay, setSelectedDay] = useState(today);
@@ -126,10 +122,7 @@ export function Calander() {
 
   const currentMonth = currentDate.toFormat("LLLL");
   const currentYear = currentDate.year;
-
-  // IMPORTANT:
-  // selectedDay is already a calendar date string like "2026-08-16".
-  // Don't convert it through JavaScript Date.
+  
   const selectedDayNumber = selectedDay
     ? DateTime.fromISO(selectedDay).day
     : "";
