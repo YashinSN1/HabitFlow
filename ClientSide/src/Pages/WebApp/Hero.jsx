@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Habit from "./Habit.jsx";
 import React from "react";
 import assets from "@/assets/assets.js";
-import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
+import api from "../../api/api";
 import MobileNav from "./MobileNav.jsx";
 import { DateTime } from "luxon";
 

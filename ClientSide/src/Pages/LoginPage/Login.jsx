@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
+import api from "../../api/api";
 
 function Login() {
   const [formErrors, setFormErrors] = useState({});

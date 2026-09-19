@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
+import api from "../../api/api";
 import { useNavigate, Link } from "react-router-dom";
 
 function Register() {

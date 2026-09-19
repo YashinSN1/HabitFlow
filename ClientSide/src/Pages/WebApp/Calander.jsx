@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
+import api from "../../api/api";
 import { DateTime } from "luxon";
 import MobileNav from "./MobileNav.jsx";
 
