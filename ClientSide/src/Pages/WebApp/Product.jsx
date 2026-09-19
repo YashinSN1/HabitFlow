@@ -1,11 +1,8 @@
 import ProductNavbar from "./Navbar.jsx";
 import Sidebar from "./Sidebar.jsx";
 import React from "react";
-import axios from "axios";
 import { Outlet } from "react-router-dom";
-import { useEffect } from "react";
 import MobileNav from "./MobileNav.jsx";
-import MobileCalander from "./MobileCalander.jsx";
 
 function Product() {
   let [ismenuclicked, setIsMenuClicked] = React.useState(false);

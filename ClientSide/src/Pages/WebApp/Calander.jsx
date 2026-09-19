@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
 import { DateTime } from "luxon";
 import MobileNav from "./MobileNav.jsx";
 
@@ -51,7 +51,7 @@ export function Calander() {
   useEffect(() => {
     const fetchTrackData = async () => {
       try {
-        const response = await axios.get(`/api/app/habit/tracking`, {
+        const response = await api.get(`/api/app/habit/tracking`, {
           params: {
             selectedDay,
             timezone,

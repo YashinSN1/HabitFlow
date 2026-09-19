@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Habit from "./Habit.jsx";
 import React from "react";
 import assets from "@/assets/assets.js";
-import axios from "axios";
+import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
 import MobileNav from "./MobileNav.jsx";
 import { DateTime } from "luxon";
 
@@ -19,7 +19,7 @@ function Hero() {
   useEffect(() => {
     const fetchHabits = async () => {
       try {
-        const GetHabit = await axios.get("/api/app/habits");
+        const GetHabit = await api.get("/api/app/habits");
         if (GetHabit.data.success) {
           console.log("Fetched Habits:", GetHabit.data.habits);
         }
@@ -34,7 +34,7 @@ function Hero() {
     const fetchTrackData = async () => {
       try {
         const getTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const response = await axios.get("/api/app/habit/tracking", {
+        const response = await api.get("/api/app/habit/tracking", {
           params: {
             timezone: getTimezone,
           },
@@ -126,7 +126,7 @@ function Hero() {
       .setZone(timezone)
       .toISODate();
 
-    const response = await axios.patch(
+    const response = await api.patch(
       `/api/app/habit/updateTracking/${habitId}`,
       {
         status: newStatus,
@@ -167,7 +167,7 @@ function Hero() {
 
   const createTrackData = async (habitId, status) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `/api/app/habit/createTracking/${habitId}`,
         {
           date: todayDate,
@@ -229,7 +229,7 @@ function Hero() {
       return alert(`Title and Category are required fields.`);
     }
     try {
-      let response = await axios.post(
+      let response = await api.post(
         "/api/app/newhabit",
         {
           title: HabitData?.title,
@@ -262,7 +262,7 @@ function Hero() {
     if (!HabitId) return;
 
     try {
-      let response = await axios.patch(`/api/app/habits/${HabitId}`, HabitData);
+      let response = await api.patch(`/api/app/habits/${HabitId}`, HabitData);
 
       if (response.data.success) {
         alert("Habit Updated Successfully");
@@ -296,7 +296,7 @@ function Hero() {
     if (!idToDelete) return;
 
     try {
-      let response = await axios.delete(`/api/app/habits/${idToDelete}`);
+      let response = await api.delete(`/api/app/habits/${idToDelete}`);
     } catch (error) {
       console.error("Error deleting habit:", error.response);
       alert("Error deleting habit");

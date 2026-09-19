@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
 
 function Login() {
   const [formErrors, setFormErrors] = useState({});
@@ -17,7 +16,7 @@ function Login() {
 
     try {
       const { email, password } = formData;
-      const response = await axios.post("/api/login", { email, password }, {
+      const response = await api.post("/api/login", { email, password }, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
@@ -26,7 +25,7 @@ function Login() {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
         try {
-          const appRes = await axios.get("/api/app", {  //forgot that axious get accept only 2 parameters, so I had to move the timezone to params
+          const appRes = await api.get("/api/app", {  //forgot that axious get accept only 2 parameters, so I had to move the timezone to params
             withCredentials: true,
             params: { timezone: userTimezone },
             headers: { "Content-Type": "application/json" },

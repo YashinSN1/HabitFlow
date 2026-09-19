@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "/CodingProject Intermediate/HabitFlow-main/ClientSide/src/api/api.js";
 import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
@@ -20,7 +20,7 @@ function Register() {
     try {
       setLoading(true);
 
-      const res = await axios.post("/api/register", { name, email, password }, {
+      const res = await api.post("/api/register", { name, email, password }, {
         headers: {
           "Content-Type": "application/json",
         },
