@@ -71,7 +71,7 @@ function Habit({
       )}
 
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 flex items-center w-full pb-20 justify-center overflow-y-scroll p-4"
         style={{ background: "rgba(0,0,0,0.6)" }}
       >
         <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">

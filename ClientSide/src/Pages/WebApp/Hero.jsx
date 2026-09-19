@@ -329,7 +329,7 @@ function Hero() {
         />
 
         <div className="w-full h-fit min-h-[88%] max-w-5xl lg:m-auto bg-white border border-gray-100 rounded-2xl px-4 md:px-6 py-5 shadow-sm">
-          <div className="flex w-full h-full gap-5 items-center justify-between mb-5 flex-wrap">
+          <div className="flex w-full h-full gap-5 items-center justify-between mb-5 ">
             <h1 className="text-xl md:text-2xl font-black text-black">
               Your Habits Today
             </h1>
