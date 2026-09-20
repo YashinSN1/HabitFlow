@@ -130,8 +130,8 @@ export function Calander() {
   const isToday = selectedDay === today;
 
   return (
-    <div className="w-full h-full max-w-4xl md:block hidden bg-white m-auto">
-      <div className="bg-white border w-full items-center min-h-[500px] flex justify-between border-gray-100 rounded-2xl shadow-sm">
+    <div className="w-full h-full flex justify-center items-center max-w-4xl bg-white m-auto">
+      <div className="bg-white border w-full md:flex hidden items-center min-h-[500px] justify-between border-gray-100 rounded-2xl shadow-sm">
         <div className="p-7 w-full">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-baseline gap-2">
@@ -239,8 +239,8 @@ export function Calander() {
           )}
         </div>
       </div>
-
       <MobileNav />
+
     </div>
   );
 }

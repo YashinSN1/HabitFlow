@@ -6,7 +6,7 @@ function Sidebar({ MenuClicked }) {
 
   const items = [
     { label: "Dashboard", path: "/app" },
-    { label: "Habits", path: "/app/habits" },
+    { label: "Calendar", path: "/app/calendar" },
     { label: "Analytics", path: "/app/analytics" },
     { label: "Settings", path: "/app/settings" },
   ];

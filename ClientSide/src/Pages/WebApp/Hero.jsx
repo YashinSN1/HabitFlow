@@ -3,7 +3,7 @@ import Habit from "./Habit.jsx";
 import React from "react";
 import assets from "@/assets/assets.js";
 import api from "../../api/api";
-import MobileNav from "./MobileNav.jsx";
+import PhoneCalander from "./PhoneCalander.jsx";
 import { DateTime } from "luxon";
 
 function Hero() {
@@ -15,6 +15,10 @@ function Hero() {
   );
   let [HabitTrackData, SetHabitTrackData] = useState({});
   let [isLoading, SetIsLoading] = useState({});
+  let [isCurrentDay, SetIsCurrentDay] = useState(false);
+  const handleCurentDay = (isCurrent) => {
+    SetIsCurrentDay(isCurrent);
+  };
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -30,6 +34,7 @@ function Hero() {
         console.log("Error fetching habits");
       }
     };
+
 
     const fetchTrackData = async () => {
       try {
@@ -101,69 +106,69 @@ function Hero() {
     },
     reminder: false,
   });
-  
+
   const toggleStatus = async (habitId) => {
-  if (isLoading[habitId]) return;
+    if (isLoading[habitId]) return;
 
-  const currentStatus = HabitTrackData[habitId]?.status || "pending";
+    const currentStatus = HabitTrackData[habitId]?.status || "pending";
 
-  let newStatus;
+    let newStatus;
 
-  if (currentStatus === "pending") {
-    newStatus = "completed";
-  } else if (currentStatus === "completed") {
-    newStatus = "skipped";
-  } else {
-    newStatus = "pending";
-  }
+    if (currentStatus === "pending") {
+      newStatus = "completed";
+    } else if (currentStatus === "completed") {
+      newStatus = "skipped";
+    } else {
+      newStatus = "pending";
+    }
 
-  SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
+    SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
 
-  try {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const localDate = DateTime.now()
-      .setZone(timezone)
-      .toISODate();
+      const localDate = DateTime.now()
+        .setZone(timezone)
+        .toISODate();
 
-    const response = await api.patch(
-      `/api/app/habit/updateTracking/${habitId}`,
-      {
-        status: newStatus,
-        date: localDate,
-        timezone,
-        type: "log",
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    if (response.data.success) {
-      console.log(response.data);
-
-      SetHabitTrackData((prev) => ({
-        ...prev,
-        [habitId]: {
-          ...prev[habitId],
+      const response = await api.patch(
+        `/api/app/habit/updateTracking/${habitId}`,
+        {
           status: newStatus,
+          date: localDate,
+          timezone,
+          type: "log",
         },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        console.log(response.data);
+
+        SetHabitTrackData((prev) => ({
+          ...prev,
+          [habitId]: {
+            ...prev[habitId],
+            status: newStatus,
+          },
+        }));
+      }
+    } catch (error) {
+      console.error(
+        "Error updating tracking data:",
+        error.response?.data || error
+      );
+    } finally {
+      SetIsLoading((prev) => ({
+        ...prev,
+        [habitId]: false,
       }));
     }
-  } catch (error) {
-    console.error(
-      "Error updating tracking data:",
-      error.response?.data || error
-    );
-  } finally {
-    SetIsLoading((prev) => ({
-      ...prev,
-      [habitId]: false,
-    }));
-  }
-};
+  };
 
   const createTrackData = async (habitId, status) => {
     try {
@@ -317,7 +322,7 @@ function Hero() {
 
   return (
     <>
-      <div className="w-full relative min-h-screen py-6 bg-white flex flex-col items-start justify-start px-4 md:px-8">
+      <div className={`w-full relative min-h-screen py-6 bg-white flex-col items-start justify-start px-4 md:px-8`}>
         <Habit
           CancelMode={CancelMode}
           CurrentMode={HabitMode}
@@ -327,8 +332,10 @@ function Hero() {
           editHabit={editHabit}
           deleteHabit={deleteHabit}
         />
-
-        <div className="w-full h-fit min-h-[88%] max-w-5xl lg:m-auto bg-white border border-gray-100 rounded-2xl px-4 md:px-6 py-5 shadow-sm">
+          <PhoneCalander
+          handleCurentDay={handleCurentDay}
+        />
+        <div className={`w-full h-fit min-h-[88%] max-w-5xl lg:m-auto bg-white ${isCurrentDay ? "" : "hidden"}  border border-gray-100 rounded-2xl px-4 md:px-6 py-5 shadow-sm`}>
           <div className="flex w-full h-full gap-5 items-center justify-between mb-5 ">
             <h1 className="text-xl md:text-2xl font-black text-black">
               Your Habits Today

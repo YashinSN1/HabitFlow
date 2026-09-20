@@ -7,9 +7,7 @@ function MobileNav() {
 
     const navItems = [
         { label: "Dashboard", path: "/app", icon: null },  // null for now
-        { label: "Habits", path: "/app/habits", icon: null },
         { label: "Analytics", path: "/app/analytics", icon: null },
-        { label: "Calendar", path: "/app/calendar", icon: null },
         { label: "Settings", path: "/app/settings", icon: null },
     ];
 

@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar.jsx";
 import React from "react";
 import { Outlet } from "react-router-dom";
 import MobileNav from "./MobileNav.jsx";
+import Hero from "./Hero.jsx";
 
 function Product() {
   let [ismenuclicked, setIsMenuClicked] = React.useState(false);
@@ -18,7 +19,7 @@ function Product() {
         <Sidebar MenuClicked={ismenuclicked} />
 
         <div className="flex-1 lg:overflow-hidden overflow-y-auto h-full w-full pb-20">
-          <Outlet />
+         <Outlet />
         </div>
       </div>
 

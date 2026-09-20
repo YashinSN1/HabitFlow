@@ -7,7 +7,7 @@ import Product from "./Pages/WebApp/Product.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Hero from "./Pages/WebApp/Hero.jsx";
 import { Calander } from "./Pages/WebApp/Calander.jsx";
-import  MobileCalander  from "./Pages/WebApp/MobileCalander.jsx";
+import  MobileCalander  from "./Pages/WebApp/PhoneCalander.jsx";
 
 function App() {
   return (
@@ -18,9 +18,8 @@ function App() {
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
           <Route path="/app" element={<Product />}>
-            <Route index element={<Hero />} />  {/*outlet in product*/}
-            <Route path="habits" element={<Calander />} />
-            <Route path="habits" element={<MobileCalander />} />
+            <Route index element={<Hero />} /> 
+            <Route path="/app/calendar" element={<Calander />} />
           </Route>
         </Routes>
       </BrowserRouter>
