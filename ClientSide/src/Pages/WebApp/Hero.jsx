@@ -24,11 +24,15 @@ function Hero() {
     const fetchHabits = async () => {
       try {
         const GetHabit = await api.get("/api/app/habits");
-        if (GetHabit.data.success) {
+
+
+        if (GetHabit.data.success &&  GetHabit.data.habits.length > 0) {
           console.log("Fetched Habits:", GetHabit.data.habits);
         }
 
         SetAllHabits(GetHabit.data.habits);
+
+
       } catch (error) {
         console.error("Error fetching habits:", error.message);
         console.log("Error fetching habits");
@@ -352,7 +356,7 @@ function Hero() {
           </div>
 
           <div className="flex flex-col w-full h-full gap-3">
-            {AllHabits.length > 0 ? (
+            {Array.isArray(AllHabits) && AllHabits.length > 0 ? (
               AllHabits.map((habit) => (
                 <div
                   key={habit._id}

@@ -115,6 +115,8 @@ export const GetMyHabits = async (req, res) => {
       return res.status(200).json({
         success: false,
         message: "No Habit Exist",
+        habits: [],
+        count: 0,        
         details: `User Does Not Have Any Habits`,
       });
     }
@@ -126,8 +128,7 @@ export const GetMyHabits = async (req, res) => {
       count: habits.length,
       userId: userId,
     });
-
-    console.log("Fetched Habits:", habits);
+    
   } catch (error) {
     let errorMessage = "Error fetching habits";
     let errorReference = "Habit_Fetch_Error";
