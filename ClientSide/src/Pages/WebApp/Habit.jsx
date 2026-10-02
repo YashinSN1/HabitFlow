@@ -2,6 +2,7 @@ import React from "react";
 import assets from "@/assets/assets.js";
 import FrequencySelector from "./FrequencySelector.jsx";
 import CategorySelector from "./CategorySelector.jsx";
+import { useState } from "react";
 
 function Habit({
   CurrentMode,
@@ -11,11 +12,13 @@ function Habit({
   createHabit,
   editHabit,
   deleteHabit,
+  IsCreateOrEdit,
+  SetIsCreateOrEdit,
 }) {
   if (!CurrentMode) return null;
 
-  const [EditFrequency, SetEditFrequency] = React.useState(false);
-  const [EditCategory, SetEditCategory] = React.useState(false);
+  const [EditFrequency, SetEditFrequency] = useState(false);
+  const [EditCategory, SetEditCategory] = useState(false);
 
   const frequencyDefault = () => {
     const type = HabitData?.frequency?.frequencyType;
@@ -32,12 +35,13 @@ function Habit({
     return `${type} — ${days.map((d) => d.slice(0, 3)).join(", ")}`;
   };
 
-  const CreateOrEdit = () => {
-    if (CurrentMode === "Edit") {
-      editHabit();
-    } else {
-      createHabit();
-    }
+  const CreateOrEdit = (e) => {
+    e.preventDefault();
+    if (IsCreateOrEdit) return;
+
+    SetIsCreateOrEdit(true);
+    Promise.resolve(CurrentMode === "Edit" ? editHabit() : createHabit())
+      .finally(() => SetIsCreateOrEdit(false));
   };
 
   const CategoryDefault = () => {
@@ -71,7 +75,7 @@ function Habit({
       )}
 
       <div
-        className="fixed inset-0 z-50 flex items-center w-full pb-20 justify-center overflow-y-scroll p-4"
+        className={`fixed inset-0 z-50 flex items-center w-full pb-20 justify-center overflow-y-scroll ${CurrentMode === "Create" || CurrentMode === "Edit" ? "" : "hidden"} p-4`}
         style={{ background: "rgba(0,0,0,0.6)" }}
       >
         <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
@@ -120,6 +124,7 @@ function Habit({
                 className="h-24 border border-gray-200 rounded-xl px-4 py-3 resize-none outline-none focus:border-black text-sm transition-colors"
               />
             </div>
+
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold tracking-widest uppercase text-gray-400">
@@ -204,7 +209,7 @@ function Habit({
             >
               <button
                 onClick={() => deleteHabit(HabitData._id)}
-                className={`${CurrentMode === "Edit" ? "flex" : "hidden"} items-center gap-2 bg-black text-white rounded-xl text-sm font-bold py-2.5 px-4 hover:bg-red-500 transition-colors`}
+                className={`${CurrentMode === "Edit" ? "flex" : "hidden"} items-center w-full max-w-[25%] gap-2 flex itmes-center justify-center bg-black text-white rounded-xl text-sm font-bold py-2.5 px-4 hover:bg-red-500 transition-colors`}
               >
                 <img className="w-4 h-4" src={assets.bin} alt="Delete" />
                 Delete
@@ -212,16 +217,33 @@ function Habit({
 
               <button
                 onClick={CreateOrEdit}
-                className="py-2.5 px-6 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-black transition-colors"
+                disabled={IsCreateOrEdit}
+                className={`w-full ${CurrentMode === "Edit" ? "justify-between max-w-[40%]" : "justify-end"} py-2.5 px-4 text-sm font-medium rounded-md text-white ${IsCreateOrEdit
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-red-600 cursor-pointer"
+                  } focus:outline-none transition-colors`}
               >
-                {CurrentMode === "Edit" ? "Edit Habit" : "Create Habit"}
+                {IsCreateOrEdit ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {CurrentMode === "Edit" ? "Editing Habit..." : "Creating Habit..."}
+                  </span>
+                ) : (
+                  CurrentMode === "Edit" ? "Edit Habit" : "Create Habit"
+                )}
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 }
+
+
+
 
 export default Habit;

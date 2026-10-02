@@ -1,5 +1,6 @@
 import Habit from "../models/Habit.js";
 import User from "../models/User.js";
+import HabitTime from "../models/HabitTime.js";
 import HabitTracking from "../models/Habit.Tracking.js";
 import mongoose from "mongoose";
 
@@ -25,8 +26,7 @@ export const CreateHabit = async (req, res) => {
       });
     }
 
-    const { title, description, category, frequency, reminder, priority } =
-      req.body;
+    const { title, description, category, frequency, reminder, priority, habitType, duration } = req.body;
 
     if (!title) {
       return res.status(400).json({
@@ -36,18 +36,67 @@ export const CreateHabit = async (req, res) => {
         details: "Habit title is required but was not provided",
       });
     }
+    if (!frequency) {
+      return res.status(400).json({
+        success: false,
+        message: "Frequency is required",
+        errorReference: "MISSING_FREQUENCY",
+        details: "Habit frequency is required but was not provided",
+      });
+    }
+    if (!habitType) {
+      return res.status(400).json({
+        success: false,
+        message: "Habit type is required",
+        errorReference: "MISSING_HABIT_TYPE",
+        details: "Habit type is required but was not provided",
+      });
+    }
 
-    const CurrentHabit = new Habit({
-      user_id: user_id,
-      title: title,
-      description: description,
-      category: category,
-      frequency: frequency,
-      reminder: reminder,
-      priority: priority,
-    });
+    if (habitType === "Time Bound" && !duration) {
+      return res.status(400).json({
+        success: false,
+        message: "Duration is required for Time Bound habits",
+        errorReference: "MISSING_DURATION",
+        details: "Habit duration is required for Time Bound habits but was not provided",
+      });
+    }
 
-    const NewHabit = await CurrentHabit.save();
+    let NormalHabit;
+    let TimeHabit;
+    let NewHabit;
+
+    if (habitType === "Time Bound") {
+      TimeHabit = new HabitTime({
+        user_id: user_id,
+        title: title,
+        description: description,
+        category: category,
+        frequency: frequency,
+        reminder: reminder,
+        priority: priority,
+        habitType: habitType,
+        duration: duration,
+      });
+
+      NewHabit = await TimeHabit.save();
+
+    } else {
+      NormalHabit = new Habit({
+        user_id: user_id,
+        title: title,
+        description: description,
+        category: category,
+        frequency: frequency,
+        reminder: reminder,
+        priority: priority,
+        habitType: habitType,
+      });
+
+      NewHabit = await NormalHabit.save();
+
+    }
+
 
     if (!NewHabit) {
       return res.status(400).json({
@@ -58,9 +107,10 @@ export const CreateHabit = async (req, res) => {
       });
     }
 
+
     res.status(201).json({
       success: true,
-      message: "Habit Created SuccessFully",
+      message: "Habit Created Successfully",
       Habit: NewHabit,
       createdAt: NewHabit.createdAt,
     });
@@ -116,7 +166,7 @@ export const GetMyHabits = async (req, res) => {
         success: false,
         message: "No Habit Exist",
         habits: [],
-        count: 0,        
+        count: 0,
         details: `User Does Not Have Any Habits`,
       });
     }
@@ -128,7 +178,7 @@ export const GetMyHabits = async (req, res) => {
       count: habits.length,
       userId: userId,
     });
-    
+
   } catch (error) {
     let errorMessage = "Error fetching habits";
     let errorReference = "Habit_Fetch_Error";
@@ -285,9 +335,12 @@ export const DeleteHabit = async (req, res) => {
 
     const TrackingRecordExist = await HabitTracking.find({ habitId: habitId, userId: authUser.id });
 
+
+    console.log(`Found ${TrackingRecordExist.length} tracking records for habit ID '${habitId}' and user ID '${authUser.id}'`);
     if (TrackingRecordExist.length > 0) {
       await HabitTracking.deleteMany({ habitId: habitId, userId: authUser.id });
       result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
+      console.log(`Deleted ${TrackingRecordExist.length} tracking records for habit ID '${habitId}' and user ID '${authUser.id}'`);
     } else {
       result = await Habit.deleteOne({ _id: habitId, user_id: authUser.id });
     }

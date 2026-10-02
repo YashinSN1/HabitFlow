@@ -4,6 +4,7 @@ import React from "react";
 import assets from "@/assets/assets.js";
 import api from "../../api/api";
 import PhoneCalander from "./PhoneCalander.jsx";
+import ToggleHabitType from "./ToggleHabitType.jsx";
 import { DateTime } from "luxon";
 
 function Hero() {
@@ -16,9 +17,14 @@ function Hero() {
   let [HabitTrackData, SetHabitTrackData] = useState({});
   let [isLoading, SetIsLoading] = useState({});
   let [isCurrentDay, SetIsCurrentDay] = useState(false);
+  let [typeToggle, SetTypeToggle] = useState(false);
+  let [IsCreateOrEdit, SetIsCreateOrEdit] = useState(false);
   const handleCurentDay = (isCurrent) => {
     SetIsCurrentDay(isCurrent);
   };
+
+
+
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -26,7 +32,7 @@ function Hero() {
         const GetHabit = await api.get("/api/app/habits");
 
 
-        if (GetHabit.data.success &&  GetHabit.data.habits.length > 0) {
+        if (GetHabit.data.success && GetHabit.data.habits.length > 0) {
           console.log("Fetched Habits:", GetHabit.data.habits);
         }
 
@@ -108,9 +114,19 @@ function Hero() {
         DaysInMonths: [],
       },
     },
+
+    habitType: "",
+    duration: {
+      value: 2,
+      unit: "minutes",
+    },
     reminder: false,
   });
 
+  console.log("HabitData:", HabitData.habitType);
+  console.log("HabitData:", HabitData.duration);
+  console.log("HabitData:", HabitData)
+  console.log("habitMode:", HabitMode);
   const toggleStatus = async (habitId) => {
     if (isLoading[habitId]) return;
 
@@ -219,8 +235,17 @@ function Hero() {
           DaysInMonths: [],
         },
       },
+      habitType: "",
+      duration: {
+        value: 2,
+        unit: "minutes",
+      },
       reminder: false,
     });
+  };
+
+  const onCreate = () => {
+    SetHabitMode("Create");
   };
 
   let handleHabitClick = (habitId) => {
@@ -229,7 +254,13 @@ function Hero() {
     let getHabit = AllHabits.find((habit) => habit._id === habitId);
 
     if (getHabit) {
-      SetHabitData(getHabit);
+      SetHabitData({
+        ...getHabit,
+        duration: {
+          value: getHabit.duration?.value ?? 2,
+          unit: getHabit.duration?.unit ?? "minutes",
+        },
+      });
     }
   };
 
@@ -237,31 +268,47 @@ function Hero() {
     if (HabitData.title === "" || HabitData.category === "") {
       return alert(`Title and Category are required fields.`);
     }
+
     try {
-      let response = await api.post(
+      const habitPayload = {
+        title: HabitData?.title,
+        description: HabitData?.description,
+        category: HabitData?.category,
+        priority: HabitData?.priority,
+        frequency: HabitData?.frequency,
+        habitType: HabitData?.habitType,
+        reminder: HabitData?.reminder,
+      };
+
+      if (HabitData?.habitType === "Time Bound") {
+        habitPayload.duration = HabitData?.duration;
+      }
+
+      const response = await api.post(
         "/api/app/newhabit",
+        habitPayload,
         {
-          title: HabitData?.title,
-          description: HabitData?.description,
-          category: HabitData?.category,
-          priority: HabitData?.priority,
-          frequency: HabitData?.frequency,
-          reminder: HabitData?.reminder,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       if (response.data.success) {
         createTrackData(response.data.Habit._id, "pending");
 
         alert("Habit Created Successfully");
+
         const ressponseHabit = response.data.Habit;
+
         SetAllHabits((prev) => [...prev, ressponseHabit]);
+
         console.log(response.data.Habit._id);
+
         ResetHabitData();
         CancelMode();
       }
+
     } catch (error) {
       console.error("Error response:", error.response);
     }
@@ -295,8 +342,7 @@ function Hero() {
 
     ResetHabitData();
     CancelMode();
-    SetHabitId("");
-
+    SetHabitId("")
     await editInBackend();
   };
 
@@ -310,7 +356,10 @@ function Hero() {
       console.error("Error deleting habit:", error.response);
       alert("Error deleting habit");
     }
+
   };
+
+
 
   let deleteHabit = async (DeleteHabitId) => {
     const idToDelete = DeleteHabitId || HabitId;
@@ -335,8 +384,13 @@ function Hero() {
           createHabit={createHabit}
           editHabit={editHabit}
           deleteHabit={deleteHabit}
+          IsCreateOrEdit={IsCreateOrEdit}
+          SetIsCreateOrEdit={SetIsCreateOrEdit}
         />
-          <PhoneCalander
+
+        <ToggleHabitType Toggle={typeToggle} onCreate={onCreate} SetToggle={SetTypeToggle} Cancel={CancelMode} HabitData={HabitData} SetHabitData={SetHabitData} />
+
+        <PhoneCalander
           handleCurentDay={handleCurentDay}
         />
         <div className={`w-full h-fit min-h-[88%] max-w-5xl lg:m-auto bg-white ${isCurrentDay ? "" : "hidden"}  border border-gray-100 rounded-2xl px-4 md:px-6 py-5 shadow-sm`}>
@@ -346,8 +400,7 @@ function Hero() {
             </h1>
             <button
               onClick={() => {
-                SetHabitMode("Create");
-                ResetHabitData();
+                SetTypeToggle(true);
               }}
               className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 max-w-50 w-full sm:w-auto px-4 rounded-xl transition-colors shadow-sm shadow-red-200"
             >

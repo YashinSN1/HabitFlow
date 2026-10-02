@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const HabitSchema = Joi.object({
+const HabitTimeSchema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().allow('', null).optional(),
 
@@ -16,9 +16,17 @@ const HabitSchema = Joi.object({
             DaysInMonths: Joi.array().items(Joi.number()).default([]),
         }).optional(),
     }).required(),
-    habitType: Joi.string().valid('Non Time Bound', 'Time Bound').required(),  
+    habitType: Joi.string().valid('Non Time Bound', 'Time Bound').required(),
+    duration: Joi.object({
+        value: Joi.number().default(2).required(),
+
+        unit: Joi.string()
+            .valid('minutes', 'hours', 'seconds')
+            .default('minutes')
+            .required(),
+    }).required(),
     reminder: Joi.boolean().default(false),
     priority: Joi.string().allow('', null).required(),
 });
 
-export default HabitSchema;
+export default HabitTimeSchema;
