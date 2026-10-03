@@ -5,6 +5,7 @@ import ValidateSchema from '../middleware/Schema.Validator.js'
 import HabitSchema from '../middleware/Habit.Schema.Joi.js'
 import { CreateHabit, DeleteHabit, UpdateMyHabit, GetMyHabits } from '../controller/Habit.Crud.js';
 import AuthorizeUser from '../middleware/Authorize.User.js';
+import HabitTimeSchema from '../middleware/Habit.Time.Schema.Joi.js';
 
 router.get('/app', AuthorizeUser, AppController);
 router.post(
