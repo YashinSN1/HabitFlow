@@ -20,6 +20,6 @@ router.post(
 );
 router.get('/app/habits', AuthorizeUser, GetMyHabits);
 router.delete('/app/habits/:habitId', AuthorizeUser, DeleteHabit)
-router.patch('/app/habits/:habitId', AuthorizeUser, UpdateMyHabit)
+router.patch('/app/habits/:habitId', AuthorizeUser,ValidateSchema(HabitTimeSchema), UpdateMyHabit)
 
 export default router;

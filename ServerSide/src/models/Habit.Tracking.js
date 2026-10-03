@@ -24,7 +24,28 @@ const HabitEventSchema = new mongoose.Schema(
             enum: ["create", "log"],
             required: true,
         },
+        duration: {
+            value: {
+                type: Number,
+                default: 2,
+                required: true,
+            },
+            unit: {
+                type: String,
+                enum: ["minutes", "hours", "seconds"],
+                default: "minutes",
+                required: true,
+            },
+        },
 
+        habitType: {
+            type: String,
+            enum: [
+                "Non Time Bound",
+                "Time Bound"
+            ],
+            required: true,
+        },
 
         status: {
             type: String,

@@ -1,11 +1,11 @@
 import Habit from "../models/Habit.js";
 import User from "../models/User.js";
-import HabitTime from "../models/HabitTime.js";
 import HabitTracking from "../models/Habit.Tracking.js";
 import mongoose from "mongoose";
 
 export const CreateHabit = async (req, res) => {
   try {
+
     const user_id = req.user.id;
     if (!mongoose.Types.ObjectId.isValid(user_id)) {
       return res.status(400).json({
@@ -62,43 +62,21 @@ export const CreateHabit = async (req, res) => {
       });
     }
 
-    let NormalHabit;
-    let TimeHabit;
-    let NewHabit;
+    const NewHabit = new Habit({
+      user_id,
+      title,
+      description,
+      category,
+      frequency,
+      reminder,
+      priority,
+      habitType,
+      duration,
+    });
 
-    if (habitType === "Time Bound") {
-      TimeHabit = new HabitTime({
-        user_id: user_id,
-        title: title,
-        description: description,
-        category: category,
-        frequency: frequency,
-        reminder: reminder,
-        priority: priority,
-        habitType: habitType,
-        duration: duration,
-      });
+    const savedHabit = await NewHabit.save();
 
-      NewHabit = await TimeHabit.save();
-
-    } else {
-      NormalHabit = new Habit({
-        user_id: user_id,
-        title: title,
-        description: description,
-        category: category,
-        frequency: frequency,
-        reminder: reminder,
-        priority: priority,
-        habitType: habitType,
-      });
-
-      NewHabit = await NormalHabit.save();
-
-    }
-
-
-    if (!NewHabit) {
+    if (!savedHabit) {
       return res.status(400).json({
         success: false,
         message: "Failed to create habit",
@@ -111,7 +89,7 @@ export const CreateHabit = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Habit Created Successfully",
-      Habit: NewHabit,
+      Habit: savedHabit,
       createdAt: NewHabit.createdAt,
     });
   } catch (error) {

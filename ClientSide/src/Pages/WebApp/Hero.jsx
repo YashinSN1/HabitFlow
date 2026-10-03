@@ -67,7 +67,7 @@ function Hero() {
             trackDataMap[item.habitId._id] = item;
             console.log(trackDataMap);
           });
-
+          console.log("Fetched Tracking Data:", trackDataMap);
           SetHabitTrackData(trackDataMap);
         } else {
           const HabitId = response.data?.habitId;
@@ -131,7 +131,8 @@ function Hero() {
     if (isLoading[habitId]) return;
 
     const currentStatus = HabitTrackData[habitId]?.status || "pending";
-
+    let HabitData = AllHabits.find((habit) => habit._id === habitId);
+    console.log("HabitData for habitId", habitId, ":", HabitData.duration);
     let newStatus;
 
     if (currentStatus === "pending") {
@@ -142,29 +143,43 @@ function Hero() {
       newStatus = "pending";
     }
 
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const localDate = DateTime.now()
+      .setZone(timezone)
+      .toISODate();
+
     SetIsLoading((prev) => ({ ...prev, [habitId]: true }));
 
-    try {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const trackHabitPayload = {
+      status: newStatus,
+      date: localDate,
+      timezone: timezone,
+      type: "log",
+      habitType: HabitData.habitType,
+    };
 
-      const localDate = DateTime.now()
-        .setZone(timezone)
-        .toISODate();
+    if (newStatus === "completed" && HabitData.habitType === "Time Bound") {
+      trackHabitPayload.duration = HabitData.duration;
+    } else {
+      trackHabitPayload.duration = {
+        value: 2,
+        unit: "minutes"
+      };
+    }
+
+    try {
 
       const response = await api.patch(
         `/api/app/habit/updateTracking/${habitId}`,
-        {
-          status: newStatus,
-          date: localDate,
-          timezone,
-          type: "log",
-        },
+        trackHabitPayload,
         {
           headers: {
             "Content-Type": "application/json",
           },
         },
       );
+
 
       if (response.data.success) {
         console.log(response.data);
@@ -198,6 +213,8 @@ function Hero() {
           date: todayDate,
           type: "create",
           status: status,
+          habitType: HabitData.habitType,
+          duration: HabitData.duration,
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -209,6 +226,8 @@ function Hero() {
           ...prev,
           [habitId]: response.data.TrackData,
         }));
+
+        return true;
       } else {
         deleteHabit(habitId);
         console.log("Failed to create/update tracking data");
@@ -256,10 +275,6 @@ function Hero() {
     if (getHabit) {
       SetHabitData({
         ...getHabit,
-        duration: {
-          value: getHabit.duration?.value ?? 2,
-          unit: getHabit.duration?.unit ?? "minutes",
-        },
       });
     }
   };
@@ -282,6 +297,11 @@ function Hero() {
 
       if (HabitData?.habitType === "Time Bound") {
         habitPayload.duration = HabitData?.duration;
+      } else {
+        habitPayload.duration = {
+          value: 2,
+          unit: "minutes"
+        };
       }
 
       const response = await api.post(
@@ -295,9 +315,11 @@ function Hero() {
       );
 
       if (response.data.success) {
-        createTrackData(response.data.Habit._id, "pending");
+        let TrackData = createTrackData(response.data.Habit._id, "pending");
 
-        alert("Habit Created Successfully");
+        if (TrackData) {
+          alert("Habit Created Successfully");
+        }
 
         const ressponseHabit = response.data.Habit;
 

@@ -27,6 +27,6 @@ const HabitTimeSchema = Joi.object({
     }).required(),
     reminder: Joi.boolean().default(false),
     priority: Joi.string().allow('', null).required(),
-});
+}).strip().unknown(true);
 
 export default HabitTimeSchema;

@@ -27,6 +27,20 @@ const HabitSchema = new mongoose.Schema(
       },
     },
 
+    duration: {
+      value: {
+        type: Number,
+        default: 2,
+        required: true,
+      },
+      unit: {
+        type: String,
+        enum: ["minutes", "hours", "seconds"],
+        default: "minutes",
+        required: true,
+      },
+    },
+
     habitType: {
       type: String,
       enum: [

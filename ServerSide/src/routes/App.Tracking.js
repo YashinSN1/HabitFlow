@@ -7,7 +7,7 @@ import { TrackHabitRecord, GetHabitTrackingData, UpdateHabitTrackingRecord } fro
 
 router.post('/app/habit/createTracking/:Habitid', AuthorizeUser, ValidateSchema(TrackHabitData), TrackHabitRecord);
 router.get('/app/habit/tracking', AuthorizeUser, GetHabitTrackingData);
-router.patch('/app/habit/updateTracking/:Habitid', AuthorizeUser, ValidateSchema(TrackHabitData), UpdateHabitTrackingRecord);
+router.patch('/app/habit/updateTracking/:Habitid', AuthorizeUser, UpdateHabitTrackingRecord);
 
 
 export default router;

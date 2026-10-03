@@ -10,7 +10,36 @@ export const TrackHabitRecord = async (req, res) => {
     const Habitid = req.params.Habitid;
     const Userid = req.user.id;
 
-    const { type, date, status } = req.body;
+    const { type, date, status, habitType, duration } = req.body;
+
+    if (!habitType || !duration || !duration.value || !duration.unit) {
+      return res.status(400).json({
+        success: false,
+        message: "habitType and duration are required",
+      });
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: "date is required",
+      });
+    }
+
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "status is required",
+      });
+    }
+
+    if (!type) {
+      return res.status(400).json({
+        success: false,
+        message: "type is required",
+      });
+    }
+ 
 
     const UserExist = await User.findById(Userid);
 
@@ -46,6 +75,8 @@ export const TrackHabitRecord = async (req, res) => {
       date: date,
       type: type,
       status: status,
+      habitType: habitType,
+      duration: duration,
     });
 
     await newHabitTracking.save();
@@ -180,14 +211,14 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
     const UserExist = await User.findById(userId);
     let habitId = req.params.Habitid;
     const HabitExists = await Habit.findById(habitId);
-    const { status, notes, LogReason, date, timezone, type } = req.body;
-
+    const { status, notes, LogReason, date, timezone, type, habitType, duration } = req.body;
     if (!timezone) {
       return res.status(400).json({
         success: false,
         message: "timezone is required",
       });
     }
+
 
     if (!date) {
       return res.status(400).json({
@@ -243,10 +274,13 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
         notes,
         type,
         logReason: LogReason,
+        habitType,
+        duration,
       });
 
       await createdTrackRecord.save();
     }
+
     const UpdatedTrackRecord = await HabitTracking.findOneAndUpdate(
       {
         userId,
@@ -261,11 +295,15 @@ export const UpdateHabitTrackingRecord = async (req, res) => {
         status,
         notes,
         logReason: LogReason,
+        habitType,
+        duration,
       },
       {
         new: true,
       },
     );
+
+
     return res.status(200).json({
       success: true,
       message: "Habit tracking record updated successfully",

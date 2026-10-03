@@ -16,7 +16,15 @@ const HabitSchema = Joi.object({
             DaysInMonths: Joi.array().items(Joi.number()).default([]),
         }).optional(),
     }).required(),
-    habitType: Joi.string().valid('Non Time Bound', 'Time Bound').required(),  
+    duration: Joi.object({
+        value: Joi.number().default(2).optional(),
+
+        unit: Joi.string()
+            .valid('minutes', 'hours', 'seconds')
+            .default('minutes')
+            .optional(),
+    }).optional(),
+    habitType: Joi.string().valid('Non Time Bound', 'Time Bound').required(),
     reminder: Joi.boolean().default(false),
     priority: Joi.string().allow('', null).required(),
 });
