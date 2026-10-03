@@ -6,6 +6,7 @@ import HabitSchema from '../middleware/Habit.Schema.Joi.js'
 import { CreateHabit, DeleteHabit, UpdateMyHabit, GetMyHabits } from '../controller/Habit.Crud.js';
 import AuthorizeUser from '../middleware/Authorize.User.js';
 import HabitTimeSchema from '../middleware/Habit.Time.Schema.Joi.js';
+// import { HabitTimeSchema } from '../middleware/Habit.Time.Schema.Joi.js';
 
 router.get('/app', AuthorizeUser, AppController);
 router.post(
@@ -20,6 +21,6 @@ router.post(
 );
 router.get('/app/habits', AuthorizeUser, GetMyHabits);
 router.delete('/app/habits/:habitId', AuthorizeUser, DeleteHabit)
-router.patch('/app/habits/:habitId', AuthorizeUser,ValidateSchema(HabitTimeSchema), UpdateMyHabit)
+router.patch('/app/habits/:habitId', AuthorizeUser, ValidateSchema(HabitTimeSchema), UpdateMyHabit)
 
 export default router;
