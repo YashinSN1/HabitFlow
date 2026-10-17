@@ -7,7 +7,7 @@ export const ValidateSchema = (schema) => (req, res, next) => {
     const { error } = selectedSchema.validate(req.body, {
         abortEarly: false,
     });
-
+//adding for commit no reason:
     if (error) {
         const errors = {};
         const errorReferences = {};
